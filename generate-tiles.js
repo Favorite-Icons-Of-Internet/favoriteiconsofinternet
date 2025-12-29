@@ -13,6 +13,7 @@ const CONFIG = {
   BACKGROUND_COLOR: { r: 255, g: 255, b: 255, alpha: 1 },
   EAGER_LOAD_TILES: 8,
   TILES_PER_MAP_GROUP: 16,
+  HIGH_PRIORITY_TILES: 4,
   HOSTNAME: 'favoriteiconsofinternet.com',
   FORCE_REGEN: process.argv.includes('--force'),
 };
@@ -302,7 +303,8 @@ async function generateTiles() {
 
     // Add Image to Image Accumulator
     const loadingAttr = tileIndex > CONFIG.EAGER_LOAD_TILES ? ' loading="lazy"' : '';
-    allImagesHtml += `<img src="${tileFilename}" usemap="#${mapName}" width="${imageSize}" height="${imageSize}"${loadingAttr}>\n`;
+    const fetchPriorityAttr = tileIndex <= CONFIG.HIGH_PRIORITY_TILES ? ' fetchpriority="high"' : '';
+    allImagesHtml += `<img src="${tileFilename}" usemap="#${mapName}" width="${imageSize}" height="${imageSize}"${loadingAttr}${fetchPriorityAttr}>\n`;
 
     // Add Map to Buffer
     mapsBuffer += `<map name="${mapName}">\n${htmlAreas.join('\n')}\n</map>\n`;
