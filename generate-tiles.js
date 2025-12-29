@@ -89,7 +89,9 @@ async function generateTiles() {
   const validEntries = entries
     .filter(
       (e) =>
-        (e.status === 'downloaded' || e.status === 'not_modified' || e.status === 'skipped_recent') &&
+        (e.status === 'downloaded' ||
+          e.status === 'not_modified' ||
+          e.status === 'skipped_recent') &&
         e.localPath &&
         e.rank, // Ensure rank exists
     )
