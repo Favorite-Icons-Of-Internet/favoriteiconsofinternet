@@ -11,6 +11,7 @@ const CONFIG = {
   ICONS_DIR: 'icons',
   MAX_REQUESTS: 50000,
   SAVE_BATCH_SIZE: 25,
+  MAX_RETRIES: 3,
   USER_AGENT: 'Mozilla/5.0 (compatible; FaviconDownloader/1.0)',
   TIMEOUT_MS: 10000,
   TARGET_SIZE: 32,
@@ -94,6 +95,19 @@ Processing [Rank ${entry.rank}] ${domain}...`);
     };
 
     if (prevEntry) {
+      if (prevEntry.failureCount && prevEntry.failureCount >= CONFIG.MAX_RETRIES) {
+        console.log(`  Skipping: Exceeded max retries (${prevEntry.failureCount})`);
+        results.push({
+          ...prevEntry,
+          status: 'skipped_max_retries',
+        });
+
+        if (results.length % CONFIG.SAVE_BATCH_SIZE === 0) {
+          await saveProgress(inputEntries, results, stateMap, CONFIG.OUTPUT_FILE);
+        }
+        continue;
+      }
+
       if (prevEntry.etag) headers['If-None-Match'] = prevEntry.etag;
       if (prevEntry.lastModified) headers['If-Modified-Since'] = prevEntry.lastModified;
 
@@ -143,6 +157,7 @@ Processing [Rank ${entry.rank}] ${domain}...`);
       if (response.status === 304) {
         console.log(`  Make: 304 Not Modified. (No change)`);
         status = 'not_modified';
+        metadata.failureCount = 0; // Reset on success
       } else if (response.status === 200) {
         console.log(`  Make: 200 OK. Downloading...`);
 
@@ -207,15 +222,18 @@ Processing [Rank ${entry.rank}] ${domain}...`);
         metadata.contentLength = response.headers.get('content-length');
         metadata.contentType = response.headers.get('content-type');
         status = 'downloaded';
+        metadata.failureCount = 0; // Reset on success
       } else {
         console.warn(`  Warning: HTTP ${response.status} - ${response.statusText}`);
         status = 'failed';
         error = `HTTP ${response.status}`;
+        metadata.failureCount = (metadata.failureCount || 0) + 1;
       }
     } catch (e) {
       console.error(`  Error: ${e.message}`);
       status = 'error';
       error = e.message;
+      metadata.failureCount = (metadata.failureCount || 0) + 1;
     }
 
     // Merge updates into result object
