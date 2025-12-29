@@ -14,6 +14,7 @@ const CONFIG = {
   EAGER_LOAD_TILES: 32,
   TILES_PER_MAP_GROUP: 16,
   HOSTNAME: 'favoriteiconsofinternet.com',
+  FORCE_REGEN: process.argv.includes('--force'),
 };
 
 async function ensureDir(dir) {
@@ -25,6 +26,7 @@ async function ensureDir(dir) {
 }
 
 async function generateOgImage(entries, cellSize) {
+  const ogImagePath = path.join(CONFIG.TILES_DIR, 'og_image.jpg');
   console.log('\n🎨 Generating Open Graph Image...');
   const width = 1200;
   const height = 630;
@@ -32,11 +34,49 @@ async function generateOgImage(entries, cellSize) {
   const rows = Math.ceil(height / cellSize);
   const maxIcons = cols * rows;
 
+  const iconsToUse = entries.slice(0, Math.min(entries.length, maxIcons));
+  let shouldGenerate = CONFIG.FORCE_REGEN;
+
+  if (!shouldGenerate) {
+    try {
+      const ogStats = await fs.stat(ogImagePath);
+      const ogMtime = ogStats.mtimeMs;
+
+      // Check if any used icon is newer
+      let isStale = false;
+      for (const entry of iconsToUse) {
+        try {
+          const iconStats = await fs.stat(entry.localPath);
+          if (iconStats.mtimeMs > ogMtime) {
+            isStale = true;
+            break;
+          }
+        } catch (e) {
+          isStale = true;
+          break;
+        }
+      }
+
+      if (isStale) {
+        console.log(`  🔄 OG Image is stale. Regenerating...`);
+        shouldGenerate = true;
+      } else {
+        console.log(`  ⏭️  OG Image is up to date. Skipping generation.`);
+        return;
+      }
+    } catch (e) {
+      console.log(`  ✨ OG Image is missing. Generating...`);
+      shouldGenerate = true;
+    }
+  } else {
+    console.log(`  🔄 Force regenerating OG Image...`);
+  }
+
   const composites = [];
 
   // Use the top ranked icons
-  for (let i = 0; i < Math.min(entries.length, maxIcons); i++) {
-    const entry = entries[i];
+  for (let i = 0; i < iconsToUse.length; i++) {
+    const entry = iconsToUse[i];
     const col = i % cols;
     const row = Math.floor(i / cols);
     const left = col * cellSize + CONFIG.BORDER_SIZE;
@@ -68,7 +108,7 @@ async function generateOgImage(entries, cellSize) {
   })
     .composite(composites)
     .jpeg() // Change to jpeg
-    .toFile(path.join(CONFIG.TILES_DIR, 'og_image.jpg'));
+    .toFile(ogImagePath);
   console.log('✅ Saved OG Image: dist/og_image.jpg');
 }
 
@@ -172,18 +212,58 @@ async function generateTiles() {
 
     // Generate Image
     try {
-      await sharp({
-        create: {
-          width: imageSize,
-          height: imageSize,
-          channels: 4,
-          background: CONFIG.BACKGROUND_COLOR,
-        },
-      })
-        .composite(composites)
-        .webp() // Changed to .webp()
-        .toFile(tilePath);
-      console.log(`  ✅ Saved Image: ${tilePath}`);
+      let shouldGenerate = CONFIG.FORCE_REGEN;
+
+      if (!shouldGenerate) {
+        try {
+          const tileStats = await fs.stat(tilePath);
+          const tileMtime = tileStats.mtimeMs;
+
+          // Check if any icon in this chunk is newer than the tile
+          let isStale = false;
+          for (const entry of chunk) {
+            try {
+              const iconStats = await fs.stat(entry.localPath);
+              if (iconStats.mtimeMs > tileMtime) {
+                isStale = true;
+                break;
+              }
+            } catch (e) {
+              // If icon file is missing (shouldn't happen given filter), force regen
+              isStale = true;
+              break;
+            }
+          }
+
+          if (isStale) {
+            console.log(`  🔄 Tile #${tileIndex} is stale. Regenerating...`);
+            shouldGenerate = true;
+          } else {
+            console.log(`  ⏭️  Tile #${tileIndex} is up to date. Skipping generation.`);
+          }
+        } catch (e) {
+          // Tile doesn't exist
+          console.log(`  ✨ Tile #${tileIndex} is missing. Generating...`);
+          shouldGenerate = true;
+        }
+      } else {
+         console.log(`  🔄 Force regenerating Tile #${tileIndex}...`);
+      }
+
+      if (shouldGenerate) {
+        await sharp({
+          create: {
+            width: imageSize,
+            height: imageSize,
+            channels: 4,
+            background: CONFIG.BACKGROUND_COLOR,
+          },
+        })
+          .composite(composites)
+          .webp() // Changed to .webp()
+          .toFile(tilePath);
+        console.log(`  ✅ Saved Image: ${tilePath}`);
+      }
     } catch (err) {
       console.error(`  ❌ Error generating image for tile ${tileIndex}: ${err.message}`);
     }
