@@ -1,5 +1,7 @@
 node_modules
 favicons.json
 favicons-processed.json
+favicons-downloaded.json
 domain-lists
 .DS_Store
+icons/
