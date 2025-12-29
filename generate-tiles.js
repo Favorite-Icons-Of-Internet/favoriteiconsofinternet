@@ -88,7 +88,7 @@ async function generateOgImage(entries, cellSize) {
     try {
       const resized = await sharp(entry.localPath)
         .resize(CONFIG.ICON_SIZE, CONFIG.ICON_SIZE)
-        .png() // Convert to PNG first to ensure transparency is handled well before resizing/compositing if needed, but standard sharp pipeline handles this. Keeping png() as intermediate is fine, but output must be webp.
+        .png() // Convert to PNG first to ensure transparency is handled well before resizing/compositing if needed, but standard sharp pipeline handles this. Keeping png() as intermediate is fine, but output must be avif.
         // Actually, we can just resize and toBuffer. Sharp handles formats.
         .toBuffer();
 
@@ -152,10 +152,10 @@ async function generateTiles() {
   let lastExistingTileIndex = 0;
   try {
     const files = await fs.readdir(CONFIG.TILES_DIR);
-    const tileFiles = files.filter((f) => f.startsWith('tile_') && f.endsWith('.webp'));
+    const tileFiles = files.filter((f) => f.startsWith('tile_') && f.endsWith('.avif'));
     const indices = tileFiles
       .map((f) => {
-        const match = f.match(/tile_(\d+)\.webp/);
+        const match = f.match(/tile_(\d+)\.avif/);
         return match ? parseInt(match[1]) : null;
       })
       .filter((n) => n !== null && !isNaN(n));
@@ -183,7 +183,7 @@ async function generateTiles() {
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
     const tileIndex = i + 1;
-    const tileFilename = `tile_${tileIndex}.webp`; // Changed to .webp
+    const tileFilename = `tile_${tileIndex}.avif`; // Changed to .avif
     const tilePath = path.join(CONFIG.TILES_DIR, tileFilename);
 
     console.log(`\n🎨 Generating Tile #${tileIndex} (${chunk.length} icons)...`);
@@ -287,7 +287,7 @@ async function generateTiles() {
           },
         })
           .composite(composites)
-          .webp() // Changed to .webp()
+          .avif() // Changed to .avif()
           .toFile(tilePath);
         console.log(`  ✅ Saved Image: ${tilePath}`);
       }
