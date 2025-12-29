@@ -9,7 +9,7 @@ const CONFIG = {
   INPUT_FILE: 'favicons-processed.json',
   OUTPUT_FILE: 'favicons-downloaded.json',
   ICONS_DIR: 'icons',
-  MAX_REQUESTS: 5000,
+  MAX_REQUESTS: 10000,
   USER_AGENT: 'Mozilla/5.0 (compatible; FaviconDownloader/1.0)',
   TIMEOUT_MS: 10000,
   TARGET_SIZE: 32,

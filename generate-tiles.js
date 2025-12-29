@@ -215,6 +215,8 @@ async function generateTiles() {
   <head>
     <title>Favorite Icons of Internet</title>
     <meta property="og:title" content="Favorite Icons of Internet" />
+    <meta property="og:url" content="https://favoriteiconsofinternet.com" />
+    <meta property="og:description" content="Favorite icons map of internet" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://${CONFIG.HOSTNAME}/og_image.jpg" />
     <meta property="og:image:width" content="1200" />
