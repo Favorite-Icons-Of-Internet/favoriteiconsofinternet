@@ -108,7 +108,7 @@ async function generateOgImage(entries, cellSize) {
     },
   })
     .composite(composites)
-    .webp() // Change to webp
+    .webp({ quality: 20 }) // Change to webp with 25% quality
     .toFile(ogImagePath);
   console.log('✅ Saved OG Image: dist/og_image.webp');
 }
