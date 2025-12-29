@@ -12,7 +12,6 @@ const CONFIG = {
   BORDER_SIZE: 1,
   BACKGROUND_COLOR: { r: 255, g: 255, b: 255, alpha: 1 },
   EAGER_LOAD_TILES: 8,
-  TILES_PER_MAP_GROUP: 16,
   HIGH_PRIORITY_TILES: 4,
   HOSTNAME: 'favoriteiconsofinternet.com',
   FORCE_REGEN: process.argv.includes('--force'),
@@ -179,8 +178,9 @@ async function generateTiles() {
   // Generate OG Image
   await generateOgImage(validEntries, cellSize);
 
-  let allImagesHtml = '';
-  let mapsBuffer = '';
+  let eagerImagesHtml = '';
+  let lazyImagesHtml = '';
+  let allMapsHtml = '';
 
   // 5. Process Chunks
   for (let i = 0; i < chunks.length; i++) {
@@ -302,23 +302,24 @@ async function generateTiles() {
     const mapName = `map_${tileIndex}`;
 
     // Add Image to Image Accumulator
-    const loadingAttr = tileIndex > CONFIG.EAGER_LOAD_TILES ? ' loading="lazy"' : '';
-    const fetchPriorityAttr = tileIndex <= CONFIG.HIGH_PRIORITY_TILES ? ' fetchpriority="high"' : '';
-    allImagesHtml += `<img src="${tileFilename}" usemap="#${mapName}" width="${imageSize}" height="${imageSize}"${loadingAttr}${fetchPriorityAttr}>\n`;
+    const isEager = tileIndex <= CONFIG.EAGER_LOAD_TILES;
+    const loadingAttr = isEager ? '' : ' loading="lazy"';
+    const fetchPriorityAttr =
+      tileIndex <= CONFIG.HIGH_PRIORITY_TILES ? ' fetchpriority="high"' : '';
+    const usemapAttr = isEager ? ` usemap="#${mapName}"` : '';
+    const imgTag = `<img src="${tileFilename}"${usemapAttr} width="${imageSize}" height="${imageSize}"${loadingAttr}${fetchPriorityAttr}>\n`;
 
-    // Add Map to Buffer
-    mapsBuffer += `<map name="${mapName}">\n${htmlAreas.join('\n')}\n</map>\n`;
-
-    // Flush maps every N tiles or at the end
-    if (tileIndex % CONFIG.TILES_PER_MAP_GROUP === 0 || i === chunks.length - 1) {
-      const startTile = Math.max(
-        1,
-        tileIndex - (tileIndex % CONFIG.TILES_PER_MAP_GROUP || CONFIG.TILES_PER_MAP_GROUP) + 1,
-      );
-      allImagesHtml += `<!-- Maps for Tiles ${startTile} - ${tileIndex} -->\n${mapsBuffer}`;
-      mapsBuffer = ''; // Clear buffer
+    if (isEager) {
+      eagerImagesHtml += imgTag;
+      // Add Map to Buffer (only for eager tiles)
+      allMapsHtml += `<map name="${mapName}">\n${htmlAreas.join('\n')}\n</map>\n`;
+    } else {
+      lazyImagesHtml += imgTag;
     }
   }
+
+  // Combine content: Eager Images -> All Maps -> Lazy Images
+  const allImagesHtml = eagerImagesHtml + allMapsHtml + lazyImagesHtml;
 
   // 6. Generate Single Index HTML
   const finalHtmlContent = `<!DOCTYPE html>

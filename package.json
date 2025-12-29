@@ -8,6 +8,7 @@
     "download:icons": "node download-favicons.js",
     "download:data": "node download-favicons-data.js",
     "process": "node process-favicons.js",
+    "gen:tiles": "node generate-tiles.js",
     "format": "prettier --write ."
   },
   "author": "",

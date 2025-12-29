@@ -1,5 +1,6 @@
 node_modules
 icons
 favicons*.json
-dist
+dist/*
+!dist/index.html
 build
