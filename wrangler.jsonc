@@ -1,6 +1,7 @@
 {
   "name": "favoriteiconsofinternet",
   "compatibility_date": "2025-12-29",
+  "preview_urls": true,
   "assets": {
     "directory": "./dist"
   }
