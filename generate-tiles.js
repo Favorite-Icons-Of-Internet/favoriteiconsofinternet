@@ -6,13 +6,14 @@ import sharp from 'sharp';
 const CONFIG = {
   INPUT_FILE: 'favicons-downloaded.json',
   OUTPUT_FILE: 'favicons-tiled.json',
-  TILES_DIR: 'tiles',
+  TILES_DIR: 'dist',
   GRID_SIZE: 10,
   ICON_SIZE: 16,
   BORDER_SIZE: 1,
   BACKGROUND_COLOR: { r: 255, g: 255, b: 255, alpha: 1 },
   EAGER_LOAD_TILES: 32,
   TILES_PER_MAP_GROUP: 16,
+  HOSTNAME: 'favoriteiconsofinternet.com',
 };
 
 async function ensureDir(dir) {
@@ -21,6 +22,53 @@ async function ensureDir(dir) {
   } catch {
     await fs.mkdir(dir, { recursive: true });
   }
+}
+
+async function generateOgImage(entries, cellSize) {
+  console.log('\n🎨 Generating Open Graph Image...');
+  const width = 1200;
+  const height = 630;
+  const cols = Math.ceil(width / cellSize);
+  const rows = Math.ceil(height / cellSize);
+  const maxIcons = cols * rows;
+
+  const composites = [];
+
+  // Use the top ranked icons
+  for (let i = 0; i < Math.min(entries.length, maxIcons); i++) {
+    const entry = entries[i];
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const left = col * cellSize + CONFIG.BORDER_SIZE;
+    const top = row * cellSize + CONFIG.BORDER_SIZE;
+
+    // Safety check for bounds
+    if (top + CONFIG.ICON_SIZE > height) break;
+
+    try {
+      const resized = await sharp(entry.localPath)
+        .resize(CONFIG.ICON_SIZE, CONFIG.ICON_SIZE)
+        .png()
+        .toBuffer();
+
+      composites.push({ input: resized, top, left });
+    } catch (e) {
+      continue;
+    }
+  }
+
+  await sharp({
+    create: {
+      width,
+      height,
+      channels: 4,
+      background: CONFIG.BACKGROUND_COLOR,
+    },
+  })
+    .composite(composites)
+    .png()
+    .toFile(path.join(CONFIG.TILES_DIR, 'og_image.png'));
+  console.log('✅ Saved OG Image: tiles/og_image.png');
 }
 
 async function generateTiles() {
@@ -56,6 +104,9 @@ async function generateTiles() {
 
   const cellSize = CONFIG.ICON_SIZE + CONFIG.BORDER_SIZE * 2; // 32 + 2 + 2 = 36
   const imageSize = cellSize * CONFIG.GRID_SIZE; // 36 * 10 = 360
+
+  // Generate OG Image
+  await generateOgImage(validEntries, cellSize);
 
   let allImagesHtml = '';
   let mapsBuffer = '';
@@ -157,6 +208,11 @@ async function generateTiles() {
 <html>
   <head>
     <title>Favorite Icons of Internet</title>
+    <meta property="og:title" content="Favorite Icons of Internet" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://${CONFIG.HOSTNAME}/og_image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <base target="_blank" />
     <style>        body { margin: 0; padding: 0; background: white; }
         .tiles-wrapper { 
