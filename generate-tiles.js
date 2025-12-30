@@ -429,7 +429,7 @@ async function generateTiles() {
   // Generate Cloudflare _headers file
   let headersContent = '/\n';
   for (let i = 1; i <= Math.min(chunks.length, CONFIG.HIGH_PRIORITY_TILES); i++) {
-    headersContent += `  Link: </tile_${i}.avif>; rel=preload; as=image\n`;
+    headersContent += `  Link: </tile_${i}.avif>; rel=preload; as=image; fetchpriority=high\n`;
   }
   const headersPath = path.join(CONFIG.TILES_DIR, '_headers');
   await fs.writeFile(headersPath, headersContent);
