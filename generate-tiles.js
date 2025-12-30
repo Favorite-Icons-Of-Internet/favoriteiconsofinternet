@@ -10,7 +10,7 @@ const CONFIG = {
   GRID_SIZE: 10,
   ICON_SIZE: 32,
   BORDER_SIZE: 2,
-  BACKGROUND_COLOR: { r: 255, g: 255, b: 255, alpha: 1 },
+  BACKGROUND_COLOR: { r: 255, g: 255, b: 255, alpha: 0 },
   EAGER_LOAD_TILES: 8,
   HIGH_PRIORITY_TILES: 4,
   HOSTNAME: 'favoriteiconsofinternet.com',
@@ -358,7 +358,8 @@ async function generateTiles() {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <base target="_blank" />
-    <style>        body { margin: 0; padding: 0; background: white; }
+    <meta name="color-scheme" content="light dark">
+    <style>        body { margin: 0; padding: 0; background-color: Field; }
         .tiles-wrapper { 
             font-size: 0; 
             line-height: 0; 
@@ -406,7 +407,7 @@ async function generateTiles() {
               map.appendChild(area);
             });
 
-            img.parentNode.appendChild(map);
+            img.after(map);
           })
           .catch(err => {
             console.error('Failed to load map for ' + src, err);
