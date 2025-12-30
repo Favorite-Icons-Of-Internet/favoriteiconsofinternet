@@ -82,9 +82,6 @@ async function generateOgImage(entries, cellSize) {
     const left = col * cellSize + CONFIG.BORDER_SIZE;
     const top = row * cellSize + CONFIG.BORDER_SIZE;
 
-    // Safety check for bounds
-    if (top + CONFIG.ICON_SIZE > height) break;
-
     try {
       const resized = await sharp(entry.localPath)
         .resize(CONFIG.ICON_SIZE, CONFIG.ICON_SIZE)
