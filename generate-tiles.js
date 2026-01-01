@@ -15,6 +15,8 @@ const CONFIG = {
   HIGH_PRIORITY_TILES: 4,
   HOSTNAME: 'favoriteiconsofinternet.com',
   FORCE_REGEN: process.argv.includes('--force'),
+  EMULATE_MORE_TILES_HTML: true,
+  EMULATE_MORE_TILES_HTML_TOTAL_ICONS: 20000,
 };
 
 async function ensureDir(dir) {
@@ -328,13 +330,26 @@ async function generateTiles() {
     const loadingAttr = isEager ? '' : ' loading="lazy"';
     const fetchPriorityAttr =
       tileIndex <= CONFIG.HIGH_PRIORITY_TILES ? ' fetchpriority="high"' : '';
-    const usemapAttr = ` usemap="#${mapName}"`;
-    const imgTag = `<img src="${tileFilename}"${usemapAttr} width="${imageSize}" height="${imageSize}"${loadingAttr}${fetchPriorityAttr} onload="loadMap(this, ${tileIndex})">\n`;
+    const imgTag = `<img src="${tileFilename}" usemap="#${mapName}" width="${imageSize}" height="${imageSize}"${loadingAttr}${fetchPriorityAttr} onload="loadMap(this, ${tileIndex})">\n`;
 
     if (isEager) {
       eagerImagesHtml += imgTag;
       // Do not inline map for eager tiles anymore, JS will handle it
     } else {
+      lazyImagesHtml += imgTag;
+    }
+  }
+
+  if (CONFIG.EMULATE_MORE_TILES_HTML) {
+    const totalEmulatedTiles = Math.ceil(
+      CONFIG.EMULATE_MORE_TILES_HTML_TOTAL_ICONS / CONFIG.GRID_SIZE ** 2 - chunks.length,
+    );
+
+    console.log(`\n🧩 Creating ${totalEmulatedTiles} emulated tiles...`);
+
+    for (let i = 0; i < totalEmulatedTiles; i++) {
+      const tileIndex = chunks.length + i;
+      const imgTag = `<img src="tile_1.avif" usemap="#map_${tileIndex}" width="${imageSize}" height="${imageSize}" loading="lazy" onload="loadMap(this, ${tileIndex}, 1)">\n`;
       lazyImagesHtml += imgTag;
     }
   }
@@ -374,7 +389,7 @@ async function generateTiles() {
       img { border: 0; display: inline-block; margin: 0; padding: 0; vertical-align: top; }
     </style>
     <script>
-      function loadMap(img, tileIndex) {
+      function loadMap(img, tileIndex, mapIndexOverride) {
         if (img.dataset.mapLoaded) return;
         img.dataset.mapLoaded = "true";
 
@@ -384,7 +399,7 @@ async function generateTiles() {
           BORDER_SIZE: ${CONFIG.BORDER_SIZE}
         };
 
-        fetch(\`tile_\${tileIndex}.json\`)
+        fetch(\`tile_\${mapIndexOverride ? mapIndexOverride : tileIndex}.json\`)
           .then(res => res.json())
           .then(domains => {
             const mapName = \`map_\${tileIndex}\`;
@@ -425,7 +440,7 @@ async function generateTiles() {
 
   const indexHtmlPath = path.join(CONFIG.TILES_DIR, 'index.html');
   await fs.writeFile(indexHtmlPath, finalHtmlContent);
-  console.log(`✅ Saved Combined Index HTML: ${indexHtmlPath}`);
+  console.log(`\n✅ Saved Combined Index HTML: ${indexHtmlPath}`);
 
   // Generate Cloudflare _headers file
   let headersContent = '/\n';
