@@ -1,6 +1,16 @@
 import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
+import { Command } from 'commander';
+
+const program = new Command();
+
+program
+  .option('--force', 'Force regeneration of tiles')
+  .option('--emulate [count]', 'Emulate more tiles', (val) => parseInt(val, 10), 0);
+
+program.parse();
+const options = program.opts();
 
 // --- Configuration ---
 const CONFIG = {
@@ -14,9 +24,9 @@ const CONFIG = {
   EAGER_LOAD_TILES: 8,
   HIGH_PRIORITY_TILES: 4,
   HOSTNAME: 'favoriteiconsofinternet.com',
-  FORCE_REGEN: process.argv.includes('--force'),
-  EMULATE_MORE_TILES: process.argv.includes('--emulate'),
-  EMULATE_MORE_TILES_TOTAL_ICONS: 20000,
+  FORCE_REGEN: options.force,
+  EMULATE_MORE_TILES: options.emulate !== 0,
+  EMULATE_MORE_TILES_TOTAL_ICONS: options.emulate === true ? 20000 : options.emulate,
 };
 
 async function ensureDir(dir) {
@@ -348,8 +358,11 @@ async function generateTiles() {
       .map(() => ({ ...firstEntry }));
     await generateOneTile(chunk, emulateTileIndex, lastExistingTileIndex, cellSize, imageSize);
 
-    const totalEmulatedTiles = Math.ceil(
-      CONFIG.EMULATE_MORE_TILES_TOTAL_ICONS / CONFIG.GRID_SIZE ** 2 - chunks.length,
+    const totalEmulatedTiles = Math.max(
+      0,
+      Math.ceil(
+        CONFIG.EMULATE_MORE_TILES_TOTAL_ICONS / CONFIG.GRID_SIZE ** 2 - chunks.length,
+      ),
     );
 
     console.log(`\n🧩 Creating ${totalEmulatedTiles} emulated tiles...`);
