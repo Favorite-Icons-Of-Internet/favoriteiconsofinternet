@@ -5,6 +5,7 @@
   "main": "download-favicons.js",
   "type": "module",
   "scripts": {
+    "dev": "npx http-server dist/",
     "download:icons": "node download-favicons.js",
     "download:data": "node download-favicons-data.js",
     "process": "node process-favicons.js",

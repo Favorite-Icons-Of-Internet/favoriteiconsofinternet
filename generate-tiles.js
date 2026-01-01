@@ -182,7 +182,7 @@ async function generateTiles() {
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
     const tileIndex = i + 1;
-    const tileFilename = `tile_${tileIndex}.avif`; // Changed to .avif
+    const tileFilename = `tile_${tileIndex}.avif`;
     const tilePath = path.join(CONFIG.TILES_DIR, tileFilename);
 
     console.log(`\n🎨 Generating Tile #${tileIndex} (${chunk.length} icons)...`);
@@ -329,7 +329,7 @@ async function generateTiles() {
     const fetchPriorityAttr =
       tileIndex <= CONFIG.HIGH_PRIORITY_TILES ? ' fetchpriority="high"' : '';
     const usemapAttr = ` usemap="#${mapName}"`;
-    const imgTag = `<img src="${tileFilename}"${usemapAttr} width="${imageSize}" height="${imageSize}"${loadingAttr}${fetchPriorityAttr} onload="loadMap(this)">\n`;
+    const imgTag = `<img src="${tileFilename}"${usemapAttr} width="${imageSize}" height="${imageSize}"${loadingAttr}${fetchPriorityAttr} onload="loadMap(this, ${tileIndex})">\n`;
 
     if (isEager) {
       eagerImagesHtml += imgTag;
@@ -374,7 +374,7 @@ async function generateTiles() {
       img { border: 0; display: inline-block; margin: 0; padding: 0; vertical-align: top; }
     </style>
     <script>
-      function loadMap(img) {
+      function loadMap(img, tileIndex) {
         if (img.dataset.mapLoaded) return;
         img.dataset.mapLoaded = "true";
 
@@ -383,11 +383,6 @@ async function generateTiles() {
           ICON_SIZE: ${CONFIG.ICON_SIZE},
           BORDER_SIZE: ${CONFIG.BORDER_SIZE}
         };
-
-        const src = img.getAttribute('src');
-        const match = src.match(/tile_(\\d+)\\.avif/);
-        if (!match) return;
-        const tileIndex = match[1];
 
         fetch(\`tile_\${tileIndex}.json\`)
           .then(res => res.json())
@@ -415,7 +410,7 @@ async function generateTiles() {
             img.after(map);
           })
           .catch(err => {
-            console.error('Failed to load map for ' + src, err);
+            console.error('Failed to load map for tile ' + tileIndex, err);
             delete img.dataset.mapLoaded;
           });
       }
