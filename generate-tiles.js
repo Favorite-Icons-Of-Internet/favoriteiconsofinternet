@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import { Command } from 'commander';
+import { getDomain, getIconFilename } from './utils.js';
 
 const program = new Command();
 
@@ -16,6 +17,7 @@ const options = program.opts();
 const CONFIG = {
   INPUT_FILE: 'favicons-downloaded.json',
   OUTPUT_FILE: 'favicons-tiled.json',
+  ICONS_DIR: 'icons',
   TILES_DIR: 'dist',
   GRID_SIZE: 10,
   ICON_SIZE: 32,
@@ -29,6 +31,29 @@ const CONFIG = {
   EMULATE_MORE_TILES_TOTAL_ICONS: options.emulate === true ? 20000 : options.emulate,
 };
 
+async function loadIconMtimes() {
+  console.log(`📂 Loading icon stats from ${CONFIG.ICONS_DIR}...`);
+  const mtimes = new Map();
+  try {
+    const files = await fs.readdir(CONFIG.ICONS_DIR);
+    for (const file of files) {
+      if (file.endsWith('.png')) {
+        const filePath = path.join(CONFIG.ICONS_DIR, file);
+        try {
+          const stats = await fs.stat(filePath);
+          mtimes.set(file, stats.mtimeMs);
+        } catch (e) {
+          // Skip if stat fails
+        }
+      }
+    }
+  } catch (e) {
+    console.error(`❌ Failed to read icons directory: ${e.message}`);
+  }
+  console.log(`✅ Loaded stats for ${mtimes.size} icons.`);
+  return mtimes;
+}
+
 async function ensureDir(dir) {
   try {
     await fs.access(dir);
@@ -37,7 +62,7 @@ async function ensureDir(dir) {
   }
 }
 
-async function generateOgImage(entries, cellSize) {
+async function generateOgImage(entries, cellSize, iconMtimes) {
   const ogImagePath = path.join(CONFIG.TILES_DIR, 'og_image.webp');
   console.log('\n🎨 Generating Open Graph Image...');
   const width = 1200;
@@ -57,13 +82,9 @@ async function generateOgImage(entries, cellSize) {
       // Check if any used icon is newer
       let isStale = false;
       for (const entry of iconsToUse) {
-        try {
-          const iconStats = await fs.stat(entry.localPath);
-          if (iconStats.mtimeMs > ogMtime) {
-            isStale = true;
-            break;
-          }
-        } catch (e) {
+        const filename = getIconFilename(entry.url);
+        const iconMtime = iconMtimes.get(filename);
+        if (iconMtime && iconMtime > ogMtime) {
           isStale = true;
           break;
         }
@@ -95,7 +116,8 @@ async function generateOgImage(entries, cellSize) {
     const top = row * cellSize + CONFIG.BORDER_SIZE;
 
     try {
-      const resized = await sharp(entry.localPath)
+      const iconPath = path.join(CONFIG.ICONS_DIR, getIconFilename(entry.url));
+      const resized = await sharp(iconPath)
         .resize(CONFIG.ICON_SIZE, CONFIG.ICON_SIZE)
         .png() // Convert to PNG first to ensure transparency is handled well before resizing/compositing if needed, but standard sharp pipeline handles this. Keeping png() as intermediate is fine, but output must be avif.
         // Actually, we can just resize and toBuffer. Sharp handles formats.
@@ -121,7 +143,14 @@ async function generateOgImage(entries, cellSize) {
   console.log('✅ Saved OG Image: dist/og_image.webp');
 }
 
-async function generateOneTile(chunk, tileIndex, lastExistingTileIndex, cellSize, imageSize) {
+async function generateOneTile(
+  chunk,
+  tileIndex,
+  lastExistingTileIndex,
+  cellSize,
+  imageSize,
+  iconMtimes,
+) {
   const tileFilename = `tile_${tileIndex}.avif`;
   const tilePath = path.join(CONFIG.TILES_DIR, tileFilename);
 
@@ -132,7 +161,7 @@ async function generateOneTile(chunk, tileIndex, lastExistingTileIndex, cellSize
 
   for (let j = 0; j < chunk.length; j++) {
     const entry = chunk[j];
-    const domain = new URL(entry.url).hostname.replace(/^www\./, '');
+    const domain = getDomain(entry.url);
     domains.push(domain);
 
     // Calculate position
@@ -143,7 +172,8 @@ async function generateOneTile(chunk, tileIndex, lastExistingTileIndex, cellSize
 
     try {
       // Resize image to ensure it fits the target size
-      const resizedImageBuffer = await sharp(entry.localPath)
+      const iconPath = path.join(CONFIG.ICONS_DIR, getIconFilename(entry.url));
+      const resizedImageBuffer = await sharp(iconPath)
         .resize(CONFIG.ICON_SIZE, CONFIG.ICON_SIZE)
         .png()
         .toBuffer();
@@ -184,14 +214,9 @@ async function generateOneTile(chunk, tileIndex, lastExistingTileIndex, cellSize
           // Check if any icon in this chunk is newer than the tile
           let isStale = false;
           for (const entry of chunk) {
-            try {
-              const iconStats = await fs.stat(entry.localPath);
-              if (iconStats.mtimeMs > tileMtime) {
-                isStale = true;
-                break;
-              }
-            } catch (e) {
-              // If icon file is missing (shouldn't happen given filter), force regen
+            const filename = getIconFilename(entry.url);
+            const iconMtime = iconMtimes.get(filename);
+            if (iconMtime && iconMtime > tileMtime) {
               isStale = true;
               break;
             }
@@ -260,6 +285,7 @@ async function generateTiles() {
 
   // 1. Setup
   await ensureDir(CONFIG.TILES_DIR);
+  const iconMtimes = await loadIconMtimes();
 
   // 2. Load Data
   console.log(`📖 Reading ${CONFIG.INPUT_FILE}...`);
@@ -275,7 +301,7 @@ async function generateTiles() {
         (e.status === 'downloaded' ||
           e.status === 'not_modified' ||
           e.status === 'skipped_recent') &&
-        e.localPath &&
+        iconMtimes.has(getIconFilename(e.url)) &&
         e.rank, // Ensure rank exists
     )
     .sort((a, b) => a.rank - b.rank);
@@ -319,7 +345,7 @@ async function generateTiles() {
   const imageSize = cellSize * CONFIG.GRID_SIZE; // 36 * 10 = 360
 
   // Generate OG Image
-  await generateOgImage(validEntries, cellSize);
+  await generateOgImage(validEntries, cellSize, iconMtimes);
 
   let eagerImagesHtml = '';
   let lazyImagesHtml = '';
@@ -329,7 +355,7 @@ async function generateTiles() {
     const chunk = chunks[i];
     const tileIndex = i + 1;
     const tileFilename = `tile_${tileIndex}.avif`;
-    await generateOneTile(chunk, tileIndex, lastExistingTileIndex, cellSize, imageSize);
+    await generateOneTile(chunk, tileIndex, lastExistingTileIndex, cellSize, imageSize, iconMtimes);
 
     // Append to Accumulators
     const mapName = `map_${tileIndex}`;
@@ -356,7 +382,14 @@ async function generateTiles() {
     const chunk = Array(chunkSize)
       .fill(null)
       .map(() => ({ ...firstEntry }));
-    await generateOneTile(chunk, emulateTileIndex, lastExistingTileIndex, cellSize, imageSize);
+    await generateOneTile(
+      chunk,
+      emulateTileIndex,
+      lastExistingTileIndex,
+      cellSize,
+      imageSize,
+      iconMtimes,
+    );
 
     const totalEmulatedTiles = Math.max(
       0,

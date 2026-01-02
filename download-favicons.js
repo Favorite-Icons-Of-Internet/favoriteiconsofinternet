@@ -3,6 +3,7 @@ import path from 'path';
 import { existsSync } from 'fs';
 import sharp from 'sharp';
 import { sharpsFromIco } from 'sharp-ico';
+import { getDomain, getIconFilename } from './utils.js';
 
 // --- Configuration ---
 const CONFIG = {
@@ -82,12 +83,11 @@ async function downloadFavicons() {
   const results = [];
 
   for (const entry of targets) {
-    const domain = new URL(entry.url).hostname.replace(/^www\./, '');
+    const domain = getDomain(entry.url);
     const faviconUrl = entry.favicon;
     const prevEntry = stateMap.get(entry.url);
 
-    console.log(`
-Processing [Rank ${entry.rank}] ${domain}...`);
+    console.log(`\nProcessing [Rank ${entry.rank}] ${domain}...`);
 
     // Prepare Headers
     const headers = {
@@ -138,6 +138,7 @@ Processing [Rank ${entry.rank}] ${domain}...`);
     let status = 'skipped';
     let error = null;
     let metadata = { ...entry, ...prevEntry }; // Start with existing data
+    delete metadata.localPath; // Cleanup legacy field
 
     try {
       const controller = new AbortController();
@@ -165,7 +166,7 @@ Processing [Rank ${entry.rank}] ${domain}...`);
         const imageBuffer = Buffer.from(buffer);
 
         // Resize and Save
-        const filename = `${domain}.png`;
+        const filename = getIconFilename(entry.url);
         const outputPath = path.join(CONFIG.ICONS_DIR, filename);
 
         // Determine if it's an ICO
@@ -218,7 +219,6 @@ Processing [Rank ${entry.rank}] ${domain}...`);
         metadata.downloadTime = new Date().toISOString();
         metadata.etag = response.headers.get('etag');
         metadata.lastModified = response.headers.get('last-modified');
-        metadata.localPath = outputPath;
         metadata.contentLength = response.headers.get('content-length');
         metadata.contentType = response.headers.get('content-type');
         status = 'downloaded';
