@@ -3,6 +3,7 @@ import { createReadStream } from 'fs';
 import { createInterface } from 'readline';
 import path from 'path';
 import { URL } from 'url';
+import { getDomain } from './utils.js';
 
 // --- Configuration ---
 const inputFile = path.join(process.cwd(), 'favicons.json');
@@ -72,7 +73,7 @@ async function processAndDeduplicateFavicons() {
       }
 
       // The URL was valid for processing, so it should be valid here.
-      const domain = new URL(entry.url).hostname.replace(/^www\./, '');
+      const domain = getDomain(entry.url);
       if (!seenDomains.has(domain)) {
         seenDomains.add(domain);
         uniqueEntriesMap.set(domain, entry);

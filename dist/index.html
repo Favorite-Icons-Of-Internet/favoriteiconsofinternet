@@ -35,7 +35,7 @@
       }
     </style>
     <script>
-      function loadMap(img) {
+      function loadMap(img, tileIndex, mapIndexOverride) {
         if (img.dataset.mapLoaded) return;
         img.dataset.mapLoaded = 'true';
 
@@ -45,12 +45,7 @@
           BORDER_SIZE: 2,
         };
 
-        const src = img.getAttribute('src');
-        const match = src.match(/tile_(\d+)\.avif/);
-        if (!match) return;
-        const tileIndex = match[1];
-
-        fetch(`tile_${tileIndex}.json`)
+        fetch(`tile_${mapIndexOverride ? mapIndexOverride : tileIndex}.json`)
           .then((res) => res.json())
           .then((domains) => {
             const mapName = `map_${tileIndex}`;
@@ -76,7 +71,7 @@
             img.after(map);
           })
           .catch((err) => {
-            console.error('Failed to load map for ' + src, err);
+            console.error('Failed to load map for tile ' + tileIndex, err);
             delete img.dataset.mapLoaded;
           });
       }
@@ -90,7 +85,7 @@
         width="360"
         height="360"
         fetchpriority="high"
-        onload="loadMap(this)"
+        onload="loadMap(this, 1)"
       />
       <img
         src="tile_2.avif"
@@ -98,7 +93,7 @@
         width="360"
         height="360"
         fetchpriority="high"
-        onload="loadMap(this)"
+        onload="loadMap(this, 2)"
       />
       <img
         src="tile_3.avif"
@@ -106,7 +101,7 @@
         width="360"
         height="360"
         fetchpriority="high"
-        onload="loadMap(this)"
+        onload="loadMap(this, 3)"
       />
       <img
         src="tile_4.avif"
@@ -114,19 +109,19 @@
         width="360"
         height="360"
         fetchpriority="high"
-        onload="loadMap(this)"
+        onload="loadMap(this, 4)"
       />
-      <img src="tile_5.avif" usemap="#map_5" width="360" height="360" onload="loadMap(this)" />
-      <img src="tile_6.avif" usemap="#map_6" width="360" height="360" onload="loadMap(this)" />
-      <img src="tile_7.avif" usemap="#map_7" width="360" height="360" onload="loadMap(this)" />
-      <img src="tile_8.avif" usemap="#map_8" width="360" height="360" onload="loadMap(this)" />
+      <img src="tile_5.avif" usemap="#map_5" width="360" height="360" onload="loadMap(this, 5)" />
+      <img src="tile_6.avif" usemap="#map_6" width="360" height="360" onload="loadMap(this, 6)" />
+      <img src="tile_7.avif" usemap="#map_7" width="360" height="360" onload="loadMap(this, 7)" />
+      <img src="tile_8.avif" usemap="#map_8" width="360" height="360" onload="loadMap(this, 8)" />
       <img
         src="tile_9.avif"
         usemap="#map_9"
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 9)"
       />
       <img
         src="tile_10.avif"
@@ -134,7 +129,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 10)"
       />
       <img
         src="tile_11.avif"
@@ -142,7 +137,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 11)"
       />
       <img
         src="tile_12.avif"
@@ -150,7 +145,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 12)"
       />
       <img
         src="tile_13.avif"
@@ -158,7 +153,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 13)"
       />
       <img
         src="tile_14.avif"
@@ -166,7 +161,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 14)"
       />
       <img
         src="tile_15.avif"
@@ -174,7 +169,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 15)"
       />
       <img
         src="tile_16.avif"
@@ -182,7 +177,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 16)"
       />
       <img
         src="tile_17.avif"
@@ -190,7 +185,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 17)"
       />
       <img
         src="tile_18.avif"
@@ -198,7 +193,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 18)"
       />
       <img
         src="tile_19.avif"
@@ -206,7 +201,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 19)"
       />
       <img
         src="tile_20.avif"
@@ -214,7 +209,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 20)"
       />
       <img
         src="tile_21.avif"
@@ -222,7 +217,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 21)"
       />
       <img
         src="tile_22.avif"
@@ -230,7 +225,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 22)"
       />
       <img
         src="tile_23.avif"
@@ -238,7 +233,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 23)"
       />
       <img
         src="tile_24.avif"
@@ -246,7 +241,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 24)"
       />
       <img
         src="tile_25.avif"
@@ -254,7 +249,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 25)"
       />
       <img
         src="tile_26.avif"
@@ -262,7 +257,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 26)"
       />
       <img
         src="tile_27.avif"
@@ -270,7 +265,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 27)"
       />
       <img
         src="tile_28.avif"
@@ -278,7 +273,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 28)"
       />
       <img
         src="tile_29.avif"
@@ -286,7 +281,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 29)"
       />
       <img
         src="tile_30.avif"
@@ -294,7 +289,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 30)"
       />
       <img
         src="tile_31.avif"
@@ -302,7 +297,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 31)"
       />
       <img
         src="tile_32.avif"
@@ -310,7 +305,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 32)"
       />
       <img
         src="tile_33.avif"
@@ -318,7 +313,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 33)"
       />
       <img
         src="tile_34.avif"
@@ -326,7 +321,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 34)"
       />
       <img
         src="tile_35.avif"
@@ -334,7 +329,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 35)"
       />
       <img
         src="tile_36.avif"
@@ -342,7 +337,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 36)"
       />
       <img
         src="tile_37.avif"
@@ -350,7 +345,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 37)"
       />
       <img
         src="tile_38.avif"
@@ -358,7 +353,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 38)"
       />
       <img
         src="tile_39.avif"
@@ -366,7 +361,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 39)"
       />
       <img
         src="tile_40.avif"
@@ -374,7 +369,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 40)"
       />
       <img
         src="tile_41.avif"
@@ -382,7 +377,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 41)"
       />
       <img
         src="tile_42.avif"
@@ -390,7 +385,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 42)"
       />
       <img
         src="tile_43.avif"
@@ -398,7 +393,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 43)"
       />
       <img
         src="tile_44.avif"
@@ -406,7 +401,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 44)"
       />
       <img
         src="tile_45.avif"
@@ -414,7 +409,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 45)"
       />
       <img
         src="tile_46.avif"
@@ -422,7 +417,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 46)"
       />
       <img
         src="tile_47.avif"
@@ -430,7 +425,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 47)"
       />
       <img
         src="tile_48.avif"
@@ -438,7 +433,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 48)"
       />
       <img
         src="tile_49.avif"
@@ -446,7 +441,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 49)"
       />
       <img
         src="tile_50.avif"
@@ -454,7 +449,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 50)"
       />
       <img
         src="tile_51.avif"
@@ -462,7 +457,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 51)"
       />
       <img
         src="tile_52.avif"
@@ -470,7 +465,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 52)"
       />
       <img
         src="tile_53.avif"
@@ -478,7 +473,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 53)"
       />
       <img
         src="tile_54.avif"
@@ -486,7 +481,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 54)"
       />
       <img
         src="tile_55.avif"
@@ -494,7 +489,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 55)"
       />
       <img
         src="tile_56.avif"
@@ -502,7 +497,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 56)"
       />
       <img
         src="tile_57.avif"
@@ -510,7 +505,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 57)"
       />
       <img
         src="tile_58.avif"
@@ -518,7 +513,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 58)"
       />
       <img
         src="tile_59.avif"
@@ -526,7 +521,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 59)"
       />
       <img
         src="tile_60.avif"
@@ -534,7 +529,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 60)"
       />
       <img
         src="tile_61.avif"
@@ -542,7 +537,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 61)"
       />
       <img
         src="tile_62.avif"
@@ -550,7 +545,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 62)"
       />
       <img
         src="tile_63.avif"
@@ -558,7 +553,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 63)"
       />
       <img
         src="tile_64.avif"
@@ -566,7 +561,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 64)"
       />
       <img
         src="tile_65.avif"
@@ -574,7 +569,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 65)"
       />
       <img
         src="tile_66.avif"
@@ -582,7 +577,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 66)"
       />
       <img
         src="tile_67.avif"
@@ -590,7 +585,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 67)"
       />
       <img
         src="tile_68.avif"
@@ -598,7 +593,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 68)"
       />
       <img
         src="tile_69.avif"
@@ -606,7 +601,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 69)"
       />
       <img
         src="tile_70.avif"
@@ -614,7 +609,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 70)"
       />
       <img
         src="tile_71.avif"
@@ -622,7 +617,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 71)"
       />
       <img
         src="tile_72.avif"
@@ -630,7 +625,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 72)"
       />
       <img
         src="tile_73.avif"
@@ -638,7 +633,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 73)"
       />
       <img
         src="tile_74.avif"
@@ -646,7 +641,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 74)"
       />
       <img
         src="tile_75.avif"
@@ -654,7 +649,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 75)"
       />
       <img
         src="tile_76.avif"
@@ -662,7 +657,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 76)"
       />
       <img
         src="tile_77.avif"
@@ -670,7 +665,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 77)"
       />
       <img
         src="tile_78.avif"
@@ -678,7 +673,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 78)"
       />
       <img
         src="tile_79.avif"
@@ -686,7 +681,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 79)"
       />
       <img
         src="tile_80.avif"
@@ -694,7 +689,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 80)"
       />
       <img
         src="tile_81.avif"
@@ -702,7 +697,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 81)"
       />
       <img
         src="tile_82.avif"
@@ -710,7 +705,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 82)"
       />
       <img
         src="tile_83.avif"
@@ -718,7 +713,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 83)"
       />
       <img
         src="tile_84.avif"
@@ -726,7 +721,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 84)"
       />
       <img
         src="tile_85.avif"
@@ -734,7 +729,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 85)"
       />
       <img
         src="tile_86.avif"
@@ -742,7 +737,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 86)"
       />
       <img
         src="tile_87.avif"
@@ -750,7 +745,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 87)"
       />
       <img
         src="tile_88.avif"
@@ -758,7 +753,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 88)"
       />
       <img
         src="tile_89.avif"
@@ -766,7 +761,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 89)"
       />
       <img
         src="tile_90.avif"
@@ -774,7 +769,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 90)"
       />
       <img
         src="tile_91.avif"
@@ -782,7 +777,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 91)"
       />
       <img
         src="tile_92.avif"
@@ -790,7 +785,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 92)"
       />
       <img
         src="tile_93.avif"
@@ -798,7 +793,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 93)"
       />
       <img
         src="tile_94.avif"
@@ -806,7 +801,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 94)"
       />
       <img
         src="tile_95.avif"
@@ -814,7 +809,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 95)"
       />
       <img
         src="tile_96.avif"
@@ -822,7 +817,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 96)"
       />
       <img
         src="tile_97.avif"
@@ -830,7 +825,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 97)"
       />
       <img
         src="tile_98.avif"
@@ -838,7 +833,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 98)"
       />
       <img
         src="tile_99.avif"
@@ -846,7 +841,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 99)"
       />
       <img
         src="tile_100.avif"
@@ -854,7 +849,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 100)"
       />
       <img
         src="tile_101.avif"
@@ -862,7 +857,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 101)"
       />
       <img
         src="tile_102.avif"
@@ -870,7 +865,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 102)"
       />
       <img
         src="tile_103.avif"
@@ -878,7 +873,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 103)"
       />
       <img
         src="tile_104.avif"
@@ -886,7 +881,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 104)"
       />
       <img
         src="tile_105.avif"
@@ -894,7 +889,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 105)"
       />
       <img
         src="tile_106.avif"
@@ -902,7 +897,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 106)"
       />
       <img
         src="tile_107.avif"
@@ -910,7 +905,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 107)"
       />
       <img
         src="tile_108.avif"
@@ -918,7 +913,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 108)"
       />
       <img
         src="tile_109.avif"
@@ -926,7 +921,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 109)"
       />
       <img
         src="tile_110.avif"
@@ -934,7 +929,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 110)"
       />
       <img
         src="tile_111.avif"
@@ -942,7 +937,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 111)"
       />
       <img
         src="tile_112.avif"
@@ -950,7 +945,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 112)"
       />
       <img
         src="tile_113.avif"
@@ -958,7 +953,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 113)"
       />
       <img
         src="tile_114.avif"
@@ -966,7 +961,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 114)"
       />
       <img
         src="tile_115.avif"
@@ -974,7 +969,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 115)"
       />
       <img
         src="tile_116.avif"
@@ -982,7 +977,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 116)"
       />
       <img
         src="tile_117.avif"
@@ -990,7 +985,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 117)"
       />
       <img
         src="tile_118.avif"
@@ -998,7 +993,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 118)"
       />
       <img
         src="tile_119.avif"
@@ -1006,7 +1001,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 119)"
       />
       <img
         src="tile_120.avif"
@@ -1014,7 +1009,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 120)"
       />
       <img
         src="tile_121.avif"
@@ -1022,7 +1017,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 121)"
       />
       <img
         src="tile_122.avif"
@@ -1030,7 +1025,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 122)"
       />
       <img
         src="tile_123.avif"
@@ -1038,7 +1033,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 123)"
       />
       <img
         src="tile_124.avif"
@@ -1046,7 +1041,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 124)"
       />
       <img
         src="tile_125.avif"
@@ -1054,7 +1049,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 125)"
       />
       <img
         src="tile_126.avif"
@@ -1062,7 +1057,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 126)"
       />
       <img
         src="tile_127.avif"
@@ -1070,7 +1065,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 127)"
       />
       <img
         src="tile_128.avif"
@@ -1078,7 +1073,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 128)"
       />
       <img
         src="tile_129.avif"
@@ -1086,7 +1081,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 129)"
       />
       <img
         src="tile_130.avif"
@@ -1094,7 +1089,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 130)"
       />
       <img
         src="tile_131.avif"
@@ -1102,7 +1097,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 131)"
       />
       <img
         src="tile_132.avif"
@@ -1110,7 +1105,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 132)"
       />
       <img
         src="tile_133.avif"
@@ -1118,7 +1113,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 133)"
       />
       <img
         src="tile_134.avif"
@@ -1126,7 +1121,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 134)"
       />
       <img
         src="tile_135.avif"
@@ -1134,7 +1129,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 135)"
       />
       <img
         src="tile_136.avif"
@@ -1142,7 +1137,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 136)"
       />
       <img
         src="tile_137.avif"
@@ -1150,7 +1145,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 137)"
       />
       <img
         src="tile_138.avif"
@@ -1158,7 +1153,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 138)"
       />
       <img
         src="tile_139.avif"
@@ -1166,7 +1161,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 139)"
       />
       <img
         src="tile_140.avif"
@@ -1174,7 +1169,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 140)"
       />
       <img
         src="tile_141.avif"
@@ -1182,7 +1177,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 141)"
       />
       <img
         src="tile_142.avif"
@@ -1190,7 +1185,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 142)"
       />
       <img
         src="tile_143.avif"
@@ -1198,7 +1193,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 143)"
       />
       <img
         src="tile_144.avif"
@@ -1206,7 +1201,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 144)"
       />
       <img
         src="tile_145.avif"
@@ -1214,7 +1209,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 145)"
       />
       <img
         src="tile_146.avif"
@@ -1222,7 +1217,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 146)"
       />
       <img
         src="tile_147.avif"
@@ -1230,7 +1225,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 147)"
       />
       <img
         src="tile_148.avif"
@@ -1238,7 +1233,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 148)"
       />
       <img
         src="tile_149.avif"
@@ -1246,7 +1241,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 149)"
       />
       <img
         src="tile_150.avif"
@@ -1254,7 +1249,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 150)"
       />
       <img
         src="tile_151.avif"
@@ -1262,7 +1257,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 151)"
       />
       <img
         src="tile_152.avif"
@@ -1270,7 +1265,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 152)"
       />
       <img
         src="tile_153.avif"
@@ -1278,7 +1273,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 153)"
       />
       <img
         src="tile_154.avif"
@@ -1286,7 +1281,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 154)"
       />
       <img
         src="tile_155.avif"
@@ -1294,7 +1289,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 155)"
       />
       <img
         src="tile_156.avif"
@@ -1302,7 +1297,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 156)"
       />
       <img
         src="tile_157.avif"
@@ -1310,7 +1305,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 157)"
       />
       <img
         src="tile_158.avif"
@@ -1318,7 +1313,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 158)"
       />
       <img
         src="tile_159.avif"
@@ -1326,7 +1321,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 159)"
       />
       <img
         src="tile_160.avif"
@@ -1334,7 +1329,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 160)"
       />
       <img
         src="tile_161.avif"
@@ -1342,7 +1337,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 161)"
       />
       <img
         src="tile_162.avif"
@@ -1350,7 +1345,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 162)"
       />
       <img
         src="tile_163.avif"
@@ -1358,7 +1353,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 163)"
       />
       <img
         src="tile_164.avif"
@@ -1366,7 +1361,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 164)"
       />
       <img
         src="tile_165.avif"
@@ -1374,7 +1369,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 165)"
       />
       <img
         src="tile_166.avif"
@@ -1382,7 +1377,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 166)"
       />
       <img
         src="tile_167.avif"
@@ -1390,7 +1385,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 167)"
       />
       <img
         src="tile_168.avif"
@@ -1398,7 +1393,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 168)"
       />
       <img
         src="tile_169.avif"
@@ -1406,7 +1401,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 169)"
       />
       <img
         src="tile_170.avif"
@@ -1414,7 +1409,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 170)"
       />
       <img
         src="tile_171.avif"
@@ -1422,7 +1417,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 171)"
       />
       <img
         src="tile_172.avif"
@@ -1430,7 +1425,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 172)"
       />
       <img
         src="tile_173.avif"
@@ -1438,7 +1433,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 173)"
       />
       <img
         src="tile_174.avif"
@@ -1446,7 +1441,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 174)"
       />
       <img
         src="tile_175.avif"
@@ -1454,7 +1449,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 175)"
       />
       <img
         src="tile_176.avif"
@@ -1462,7 +1457,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 176)"
       />
       <img
         src="tile_177.avif"
@@ -1470,7 +1465,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 177)"
       />
       <img
         src="tile_178.avif"
@@ -1478,7 +1473,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 178)"
       />
       <img
         src="tile_179.avif"
@@ -1486,7 +1481,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 179)"
       />
       <img
         src="tile_180.avif"
@@ -1494,7 +1489,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 180)"
       />
       <img
         src="tile_181.avif"
@@ -1502,7 +1497,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 181)"
       />
       <img
         src="tile_182.avif"
@@ -1510,7 +1505,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 182)"
       />
       <img
         src="tile_183.avif"
@@ -1518,7 +1513,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 183)"
       />
       <img
         src="tile_184.avif"
@@ -1526,7 +1521,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 184)"
       />
       <img
         src="tile_185.avif"
@@ -1534,7 +1529,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 185)"
       />
       <img
         src="tile_186.avif"
@@ -1542,7 +1537,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 186)"
       />
       <img
         src="tile_187.avif"
@@ -1550,7 +1545,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 187)"
       />
       <img
         src="tile_188.avif"
@@ -1558,7 +1553,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 188)"
       />
       <img
         src="tile_189.avif"
@@ -1566,7 +1561,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 189)"
       />
       <img
         src="tile_190.avif"
@@ -1574,7 +1569,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 190)"
       />
       <img
         src="tile_191.avif"
@@ -1582,7 +1577,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 191)"
       />
       <img
         src="tile_192.avif"
@@ -1590,7 +1585,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 192)"
       />
       <img
         src="tile_193.avif"
@@ -1598,7 +1593,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 193)"
       />
       <img
         src="tile_194.avif"
@@ -1606,7 +1601,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 194)"
       />
       <img
         src="tile_195.avif"
@@ -1614,7 +1609,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 195)"
       />
       <img
         src="tile_196.avif"
@@ -1622,7 +1617,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 196)"
       />
       <img
         src="tile_197.avif"
@@ -1630,7 +1625,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 197)"
       />
       <img
         src="tile_198.avif"
@@ -1638,7 +1633,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 198)"
       />
       <img
         src="tile_199.avif"
@@ -1646,7 +1641,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 199)"
       />
       <img
         src="tile_200.avif"
@@ -1654,7 +1649,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 200)"
       />
       <img
         src="tile_201.avif"
@@ -1662,7 +1657,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 201)"
       />
       <img
         src="tile_202.avif"
@@ -1670,7 +1665,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 202)"
       />
       <img
         src="tile_203.avif"
@@ -1678,7 +1673,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 203)"
       />
       <img
         src="tile_204.avif"
@@ -1686,7 +1681,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 204)"
       />
       <img
         src="tile_205.avif"
@@ -1694,7 +1689,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 205)"
       />
       <img
         src="tile_206.avif"
@@ -1702,7 +1697,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 206)"
       />
       <img
         src="tile_207.avif"
@@ -1710,7 +1705,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 207)"
       />
       <img
         src="tile_208.avif"
@@ -1718,7 +1713,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 208)"
       />
       <img
         src="tile_209.avif"
@@ -1726,7 +1721,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 209)"
       />
       <img
         src="tile_210.avif"
@@ -1734,7 +1729,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 210)"
       />
       <img
         src="tile_211.avif"
@@ -1742,7 +1737,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 211)"
       />
       <img
         src="tile_212.avif"
@@ -1750,7 +1745,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 212)"
       />
       <img
         src="tile_213.avif"
@@ -1758,7 +1753,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 213)"
       />
       <img
         src="tile_214.avif"
@@ -1766,7 +1761,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 214)"
       />
       <img
         src="tile_215.avif"
@@ -1774,7 +1769,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 215)"
       />
       <img
         src="tile_216.avif"
@@ -1782,7 +1777,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 216)"
       />
       <img
         src="tile_217.avif"
@@ -1790,7 +1785,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 217)"
       />
       <img
         src="tile_218.avif"
@@ -1798,7 +1793,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 218)"
       />
       <img
         src="tile_219.avif"
@@ -1806,7 +1801,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 219)"
       />
       <img
         src="tile_220.avif"
@@ -1814,7 +1809,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 220)"
       />
       <img
         src="tile_221.avif"
@@ -1822,7 +1817,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 221)"
       />
       <img
         src="tile_222.avif"
@@ -1830,7 +1825,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 222)"
       />
       <img
         src="tile_223.avif"
@@ -1838,7 +1833,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 223)"
       />
       <img
         src="tile_224.avif"
@@ -1846,7 +1841,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 224)"
       />
       <img
         src="tile_225.avif"
@@ -1854,7 +1849,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 225)"
       />
       <img
         src="tile_226.avif"
@@ -1862,7 +1857,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 226)"
       />
       <img
         src="tile_227.avif"
@@ -1870,7 +1865,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 227)"
       />
       <img
         src="tile_228.avif"
@@ -1878,7 +1873,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 228)"
       />
       <img
         src="tile_229.avif"
@@ -1886,7 +1881,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 229)"
       />
       <img
         src="tile_230.avif"
@@ -1894,7 +1889,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 230)"
       />
       <img
         src="tile_231.avif"
@@ -1902,7 +1897,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 231)"
       />
       <img
         src="tile_232.avif"
@@ -1910,7 +1905,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 232)"
       />
       <img
         src="tile_233.avif"
@@ -1918,7 +1913,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 233)"
       />
       <img
         src="tile_234.avif"
@@ -1926,7 +1921,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 234)"
       />
       <img
         src="tile_235.avif"
@@ -1934,7 +1929,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 235)"
       />
       <img
         src="tile_236.avif"
@@ -1942,7 +1937,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 236)"
       />
       <img
         src="tile_237.avif"
@@ -1950,7 +1945,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 237)"
       />
       <img
         src="tile_238.avif"
@@ -1958,7 +1953,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 238)"
       />
       <img
         src="tile_239.avif"
@@ -1966,7 +1961,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 239)"
       />
       <img
         src="tile_240.avif"
@@ -1974,7 +1969,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 240)"
       />
       <img
         src="tile_241.avif"
@@ -1982,7 +1977,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 241)"
       />
       <img
         src="tile_242.avif"
@@ -1990,7 +1985,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 242)"
       />
       <img
         src="tile_243.avif"
@@ -1998,7 +1993,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 243)"
       />
       <img
         src="tile_244.avif"
@@ -2006,7 +2001,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 244)"
       />
       <img
         src="tile_245.avif"
@@ -2014,7 +2009,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 245)"
       />
       <img
         src="tile_246.avif"
@@ -2022,7 +2017,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 246)"
       />
       <img
         src="tile_247.avif"
@@ -2030,7 +2025,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 247)"
       />
       <img
         src="tile_248.avif"
@@ -2038,7 +2033,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 248)"
       />
       <img
         src="tile_249.avif"
@@ -2046,7 +2041,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 249)"
       />
       <img
         src="tile_250.avif"
@@ -2054,7 +2049,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 250)"
       />
       <img
         src="tile_251.avif"
@@ -2062,7 +2057,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 251)"
       />
       <img
         src="tile_252.avif"
@@ -2070,7 +2065,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 252)"
       />
       <img
         src="tile_253.avif"
@@ -2078,7 +2073,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 253)"
       />
       <img
         src="tile_254.avif"
@@ -2086,7 +2081,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 254)"
       />
       <img
         src="tile_255.avif"
@@ -2094,7 +2089,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 255)"
       />
       <img
         src="tile_256.avif"
@@ -2102,7 +2097,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 256)"
       />
       <img
         src="tile_257.avif"
@@ -2110,7 +2105,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 257)"
       />
       <img
         src="tile_258.avif"
@@ -2118,7 +2113,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 258)"
       />
       <img
         src="tile_259.avif"
@@ -2126,7 +2121,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 259)"
       />
       <img
         src="tile_260.avif"
@@ -2134,7 +2129,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 260)"
       />
       <img
         src="tile_261.avif"
@@ -2142,7 +2137,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 261)"
       />
       <img
         src="tile_262.avif"
@@ -2150,7 +2145,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 262)"
       />
       <img
         src="tile_263.avif"
@@ -2158,7 +2153,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 263)"
       />
       <img
         src="tile_264.avif"
@@ -2166,7 +2161,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 264)"
       />
       <img
         src="tile_265.avif"
@@ -2174,7 +2169,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 265)"
       />
       <img
         src="tile_266.avif"
@@ -2182,7 +2177,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 266)"
       />
       <img
         src="tile_267.avif"
@@ -2190,7 +2185,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 267)"
       />
       <img
         src="tile_268.avif"
@@ -2198,7 +2193,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 268)"
       />
       <img
         src="tile_269.avif"
@@ -2206,7 +2201,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 269)"
       />
       <img
         src="tile_270.avif"
@@ -2214,7 +2209,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 270)"
       />
       <img
         src="tile_271.avif"
@@ -2222,7 +2217,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 271)"
       />
       <img
         src="tile_272.avif"
@@ -2230,7 +2225,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 272)"
       />
       <img
         src="tile_273.avif"
@@ -2238,7 +2233,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 273)"
       />
       <img
         src="tile_274.avif"
@@ -2246,7 +2241,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 274)"
       />
       <img
         src="tile_275.avif"
@@ -2254,7 +2249,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 275)"
       />
       <img
         src="tile_276.avif"
@@ -2262,7 +2257,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 276)"
       />
       <img
         src="tile_277.avif"
@@ -2270,7 +2265,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 277)"
       />
       <img
         src="tile_278.avif"
@@ -2278,7 +2273,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 278)"
       />
       <img
         src="tile_279.avif"
@@ -2286,7 +2281,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 279)"
       />
       <img
         src="tile_280.avif"
@@ -2294,7 +2289,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 280)"
       />
       <img
         src="tile_281.avif"
@@ -2302,7 +2297,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 281)"
       />
       <img
         src="tile_282.avif"
@@ -2310,7 +2305,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 282)"
       />
       <img
         src="tile_283.avif"
@@ -2318,7 +2313,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 283)"
       />
       <img
         src="tile_284.avif"
@@ -2326,7 +2321,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 284)"
       />
       <img
         src="tile_285.avif"
@@ -2334,7 +2329,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 285)"
       />
       <img
         src="tile_286.avif"
@@ -2342,7 +2337,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 286)"
       />
       <img
         src="tile_287.avif"
@@ -2350,7 +2345,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 287)"
       />
       <img
         src="tile_288.avif"
@@ -2358,7 +2353,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 288)"
       />
       <img
         src="tile_289.avif"
@@ -2366,7 +2361,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 289)"
       />
       <img
         src="tile_290.avif"
@@ -2374,7 +2369,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 290)"
       />
       <img
         src="tile_291.avif"
@@ -2382,7 +2377,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 291)"
       />
       <img
         src="tile_292.avif"
@@ -2390,7 +2385,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 292)"
       />
       <img
         src="tile_293.avif"
@@ -2398,7 +2393,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 293)"
       />
       <img
         src="tile_294.avif"
@@ -2406,7 +2401,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 294)"
       />
       <img
         src="tile_295.avif"
@@ -2414,7 +2409,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 295)"
       />
       <img
         src="tile_296.avif"
@@ -2422,7 +2417,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 296)"
       />
       <img
         src="tile_297.avif"
@@ -2430,7 +2425,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 297)"
       />
       <img
         src="tile_298.avif"
@@ -2438,7 +2433,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 298)"
       />
       <img
         src="tile_299.avif"
@@ -2446,7 +2441,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 299)"
       />
       <img
         src="tile_300.avif"
@@ -2454,7 +2449,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 300)"
       />
       <img
         src="tile_301.avif"
@@ -2462,7 +2457,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 301)"
       />
       <img
         src="tile_302.avif"
@@ -2470,7 +2465,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 302)"
       />
       <img
         src="tile_303.avif"
@@ -2478,7 +2473,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 303)"
       />
       <img
         src="tile_304.avif"
@@ -2486,7 +2481,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 304)"
       />
       <img
         src="tile_305.avif"
@@ -2494,7 +2489,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 305)"
       />
       <img
         src="tile_306.avif"
@@ -2502,7 +2497,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 306)"
       />
       <img
         src="tile_307.avif"
@@ -2510,7 +2505,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 307)"
       />
       <img
         src="tile_308.avif"
@@ -2518,7 +2513,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 308)"
       />
       <img
         src="tile_309.avif"
@@ -2526,7 +2521,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 309)"
       />
       <img
         src="tile_310.avif"
@@ -2534,7 +2529,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 310)"
       />
       <img
         src="tile_311.avif"
@@ -2542,7 +2537,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 311)"
       />
       <img
         src="tile_312.avif"
@@ -2550,7 +2545,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 312)"
       />
       <img
         src="tile_313.avif"
@@ -2558,7 +2553,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 313)"
       />
       <img
         src="tile_314.avif"
@@ -2566,7 +2561,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 314)"
       />
       <img
         src="tile_315.avif"
@@ -2574,7 +2569,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 315)"
       />
       <img
         src="tile_316.avif"
@@ -2582,7 +2577,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 316)"
       />
       <img
         src="tile_317.avif"
@@ -2590,7 +2585,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 317)"
       />
       <img
         src="tile_318.avif"
@@ -2598,7 +2593,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 318)"
       />
       <img
         src="tile_319.avif"
@@ -2606,7 +2601,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 319)"
       />
       <img
         src="tile_320.avif"
@@ -2614,7 +2609,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 320)"
       />
       <img
         src="tile_321.avif"
@@ -2622,7 +2617,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 321)"
       />
       <img
         src="tile_322.avif"
@@ -2630,7 +2625,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 322)"
       />
       <img
         src="tile_323.avif"
@@ -2638,7 +2633,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 323)"
       />
       <img
         src="tile_324.avif"
@@ -2646,7 +2641,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 324)"
       />
       <img
         src="tile_325.avif"
@@ -2654,7 +2649,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 325)"
       />
       <img
         src="tile_326.avif"
@@ -2662,7 +2657,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 326)"
       />
       <img
         src="tile_327.avif"
@@ -2670,7 +2665,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 327)"
       />
       <img
         src="tile_328.avif"
@@ -2678,7 +2673,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 328)"
       />
       <img
         src="tile_329.avif"
@@ -2686,7 +2681,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 329)"
       />
       <img
         src="tile_330.avif"
@@ -2694,7 +2689,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 330)"
       />
       <img
         src="tile_331.avif"
@@ -2702,7 +2697,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 331)"
       />
       <img
         src="tile_332.avif"
@@ -2710,7 +2705,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 332)"
       />
       <img
         src="tile_333.avif"
@@ -2718,7 +2713,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 333)"
       />
       <img
         src="tile_334.avif"
@@ -2726,7 +2721,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 334)"
       />
       <img
         src="tile_335.avif"
@@ -2734,7 +2729,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 335)"
       />
       <img
         src="tile_336.avif"
@@ -2742,7 +2737,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 336)"
       />
       <img
         src="tile_337.avif"
@@ -2750,7 +2745,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 337)"
       />
       <img
         src="tile_338.avif"
@@ -2758,7 +2753,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 338)"
       />
       <img
         src="tile_339.avif"
@@ -2766,7 +2761,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 339)"
       />
       <img
         src="tile_340.avif"
@@ -2774,7 +2769,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 340)"
       />
       <img
         src="tile_341.avif"
@@ -2782,7 +2777,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 341)"
       />
       <img
         src="tile_342.avif"
@@ -2790,7 +2785,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 342)"
       />
       <img
         src="tile_343.avif"
@@ -2798,7 +2793,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 343)"
       />
       <img
         src="tile_344.avif"
@@ -2806,7 +2801,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 344)"
       />
       <img
         src="tile_345.avif"
@@ -2814,7 +2809,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 345)"
       />
       <img
         src="tile_346.avif"
@@ -2822,7 +2817,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 346)"
       />
       <img
         src="tile_347.avif"
@@ -2830,7 +2825,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 347)"
       />
       <img
         src="tile_348.avif"
@@ -2838,7 +2833,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 348)"
       />
       <img
         src="tile_349.avif"
@@ -2846,7 +2841,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 349)"
       />
       <img
         src="tile_350.avif"
@@ -2854,7 +2849,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 350)"
       />
       <img
         src="tile_351.avif"
@@ -2862,7 +2857,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 351)"
       />
       <img
         src="tile_352.avif"
@@ -2870,7 +2865,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 352)"
       />
       <img
         src="tile_353.avif"
@@ -2878,7 +2873,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 353)"
       />
       <img
         src="tile_354.avif"
@@ -2886,7 +2881,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 354)"
       />
       <img
         src="tile_355.avif"
@@ -2894,7 +2889,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 355)"
       />
       <img
         src="tile_356.avif"
@@ -2902,7 +2897,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 356)"
       />
       <img
         src="tile_357.avif"
@@ -2910,7 +2905,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 357)"
       />
       <img
         src="tile_358.avif"
@@ -2918,7 +2913,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 358)"
       />
       <img
         src="tile_359.avif"
@@ -2926,7 +2921,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 359)"
       />
       <img
         src="tile_360.avif"
@@ -2934,7 +2929,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 360)"
       />
       <img
         src="tile_361.avif"
@@ -2942,7 +2937,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 361)"
       />
       <img
         src="tile_362.avif"
@@ -2950,7 +2945,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 362)"
       />
       <img
         src="tile_363.avif"
@@ -2958,7 +2953,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 363)"
       />
       <img
         src="tile_364.avif"
@@ -2966,7 +2961,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 364)"
       />
       <img
         src="tile_365.avif"
@@ -2974,7 +2969,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 365)"
       />
       <img
         src="tile_366.avif"
@@ -2982,7 +2977,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 366)"
       />
       <img
         src="tile_367.avif"
@@ -2990,7 +2985,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 367)"
       />
       <img
         src="tile_368.avif"
@@ -2998,7 +2993,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 368)"
       />
       <img
         src="tile_369.avif"
@@ -3006,7 +3001,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 369)"
       />
       <img
         src="tile_370.avif"
@@ -3014,7 +3009,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 370)"
       />
       <img
         src="tile_371.avif"
@@ -3022,7 +3017,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 371)"
       />
       <img
         src="tile_372.avif"
@@ -3030,7 +3025,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 372)"
       />
       <img
         src="tile_373.avif"
@@ -3038,7 +3033,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 373)"
       />
       <img
         src="tile_374.avif"
@@ -3046,7 +3041,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 374)"
       />
       <img
         src="tile_375.avif"
@@ -3054,7 +3049,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 375)"
       />
       <img
         src="tile_376.avif"
@@ -3062,7 +3057,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 376)"
       />
       <img
         src="tile_377.avif"
@@ -3070,7 +3065,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 377)"
       />
       <img
         src="tile_378.avif"
@@ -3078,7 +3073,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 378)"
       />
       <img
         src="tile_379.avif"
@@ -3086,7 +3081,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 379)"
       />
       <img
         src="tile_380.avif"
@@ -3094,7 +3089,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 380)"
       />
       <img
         src="tile_381.avif"
@@ -3102,7 +3097,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 381)"
       />
       <img
         src="tile_382.avif"
@@ -3110,7 +3105,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 382)"
       />
       <img
         src="tile_383.avif"
@@ -3118,7 +3113,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 383)"
       />
       <img
         src="tile_384.avif"
@@ -3126,7 +3121,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 384)"
       />
       <img
         src="tile_385.avif"
@@ -3134,7 +3129,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 385)"
       />
       <img
         src="tile_386.avif"
@@ -3142,7 +3137,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 386)"
       />
       <img
         src="tile_387.avif"
@@ -3150,7 +3145,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 387)"
       />
       <img
         src="tile_388.avif"
@@ -3158,7 +3153,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 388)"
       />
       <img
         src="tile_389.avif"
@@ -3166,7 +3161,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 389)"
       />
       <img
         src="tile_390.avif"
@@ -3174,7 +3169,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 390)"
       />
       <img
         src="tile_391.avif"
@@ -3182,7 +3177,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 391)"
       />
       <img
         src="tile_392.avif"
@@ -3190,7 +3185,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 392)"
       />
       <img
         src="tile_393.avif"
@@ -3198,7 +3193,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 393)"
       />
       <img
         src="tile_394.avif"
@@ -3206,7 +3201,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 394)"
       />
       <img
         src="tile_395.avif"
@@ -3214,7 +3209,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 395)"
       />
       <img
         src="tile_396.avif"
@@ -3222,7 +3217,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 396)"
       />
       <img
         src="tile_397.avif"
@@ -3230,7 +3225,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 397)"
       />
       <img
         src="tile_398.avif"
@@ -3238,7 +3233,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 398)"
       />
       <img
         src="tile_399.avif"
@@ -3246,7 +3241,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 399)"
       />
       <img
         src="tile_400.avif"
@@ -3254,7 +3249,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 400)"
       />
       <img
         src="tile_401.avif"
@@ -3262,7 +3257,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 401)"
       />
       <img
         src="tile_402.avif"
@@ -3270,7 +3265,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 402)"
       />
       <img
         src="tile_403.avif"
@@ -3278,7 +3273,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 403)"
       />
       <img
         src="tile_404.avif"
@@ -3286,7 +3281,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 404)"
       />
       <img
         src="tile_405.avif"
@@ -3294,7 +3289,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 405)"
       />
       <img
         src="tile_406.avif"
@@ -3302,7 +3297,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 406)"
       />
       <img
         src="tile_407.avif"
@@ -3310,7 +3305,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 407)"
       />
       <img
         src="tile_408.avif"
@@ -3318,7 +3313,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 408)"
       />
       <img
         src="tile_409.avif"
@@ -3326,7 +3321,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 409)"
       />
       <img
         src="tile_410.avif"
@@ -3334,7 +3329,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 410)"
       />
       <img
         src="tile_411.avif"
@@ -3342,7 +3337,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 411)"
       />
       <img
         src="tile_412.avif"
@@ -3350,7 +3345,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 412)"
       />
       <img
         src="tile_413.avif"
@@ -3358,7 +3353,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 413)"
       />
       <img
         src="tile_414.avif"
@@ -3366,7 +3361,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 414)"
       />
       <img
         src="tile_415.avif"
@@ -3374,7 +3369,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 415)"
       />
       <img
         src="tile_416.avif"
@@ -3382,7 +3377,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 416)"
       />
       <img
         src="tile_417.avif"
@@ -3390,7 +3385,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 417)"
       />
       <img
         src="tile_418.avif"
@@ -3398,7 +3393,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 418)"
       />
       <img
         src="tile_419.avif"
@@ -3406,7 +3401,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 419)"
       />
       <img
         src="tile_420.avif"
@@ -3414,7 +3409,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 420)"
       />
       <img
         src="tile_421.avif"
@@ -3422,7 +3417,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 421)"
       />
       <img
         src="tile_422.avif"
@@ -3430,7 +3425,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 422)"
       />
       <img
         src="tile_423.avif"
@@ -3438,7 +3433,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 423)"
       />
       <img
         src="tile_424.avif"
@@ -3446,7 +3441,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 424)"
       />
       <img
         src="tile_425.avif"
@@ -3454,7 +3449,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 425)"
       />
       <img
         src="tile_426.avif"
@@ -3462,7 +3457,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 426)"
       />
       <img
         src="tile_427.avif"
@@ -3470,7 +3465,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 427)"
       />
       <img
         src="tile_428.avif"
@@ -3478,7 +3473,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 428)"
       />
       <img
         src="tile_429.avif"
@@ -3486,7 +3481,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 429)"
       />
       <img
         src="tile_430.avif"
@@ -3494,7 +3489,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 430)"
       />
       <img
         src="tile_431.avif"
@@ -3502,7 +3497,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 431)"
       />
       <img
         src="tile_432.avif"
@@ -3510,7 +3505,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 432)"
       />
       <img
         src="tile_433.avif"
@@ -3518,7 +3513,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 433)"
       />
       <img
         src="tile_434.avif"
@@ -3526,7 +3521,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 434)"
       />
       <img
         src="tile_435.avif"
@@ -3534,7 +3529,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 435)"
       />
       <img
         src="tile_436.avif"
@@ -3542,7 +3537,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 436)"
       />
       <img
         src="tile_437.avif"
@@ -3550,7 +3545,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 437)"
       />
       <img
         src="tile_438.avif"
@@ -3558,7 +3553,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 438)"
       />
       <img
         src="tile_439.avif"
@@ -3566,7 +3561,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 439)"
       />
       <img
         src="tile_440.avif"
@@ -3574,7 +3569,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 440)"
       />
       <img
         src="tile_441.avif"
@@ -3582,7 +3577,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 441)"
       />
       <img
         src="tile_442.avif"
@@ -3590,7 +3585,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 442)"
       />
       <img
         src="tile_443.avif"
@@ -3598,7 +3593,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 443)"
       />
       <img
         src="tile_444.avif"
@@ -3606,7 +3601,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 444)"
       />
       <img
         src="tile_445.avif"
@@ -3614,7 +3609,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 445)"
       />
       <img
         src="tile_446.avif"
@@ -3622,7 +3617,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 446)"
       />
       <img
         src="tile_447.avif"
@@ -3630,7 +3625,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 447)"
       />
       <img
         src="tile_448.avif"
@@ -3638,7 +3633,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 448)"
       />
       <img
         src="tile_449.avif"
@@ -3646,7 +3641,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 449)"
       />
       <img
         src="tile_450.avif"
@@ -3654,7 +3649,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 450)"
       />
       <img
         src="tile_451.avif"
@@ -3662,7 +3657,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 451)"
       />
       <img
         src="tile_452.avif"
@@ -3670,7 +3665,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 452)"
       />
       <img
         src="tile_453.avif"
@@ -3678,7 +3673,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 453)"
       />
       <img
         src="tile_454.avif"
@@ -3686,7 +3681,7 @@
         width="360"
         height="360"
         loading="lazy"
-        onload="loadMap(this)"
+        onload="loadMap(this, 454)"
       />
     </div>
   </body>
