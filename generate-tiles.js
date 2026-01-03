@@ -298,21 +298,41 @@ async function generateTiles() {
 
   // 2. Load Data
   console.log(`📖 Reading ${CONFIG.INPUT_FILE}...`);
-  const rawData = await fs.readFile(CONFIG.INPUT_FILE, 'utf-8');
-  let entries = JSON.parse(rawData);
+  let entries = [];
+  try {
+    const rawData = await fs.readFile(CONFIG.INPUT_FILE, 'utf-8');
+    entries = JSON.parse(rawData);
+    if (!Array.isArray(entries)) {
+      console.warn('⚠️ Input file is not an array, defaulting to empty list.');
+      entries = [];
+    }
+  } catch (e) {
+    console.warn(`⚠️ Failed to read/parse input file: ${e.message}. Defaulting to empty list.`);
+    entries = [];
+  }
 
   // 3. Filter and Sort
   // We only want entries that are successfully downloaded/present locally
   // and we want them sorted by rank.
   const validEntries = entries
-    .filter(
-      (e) =>
+    .filter((e) => {
+      const relativePath = getIconRelativePath(e.url);
+      const mtime = iconMtimes.get(relativePath);
+
+      if (
         (e.status === 'downloaded' ||
           e.status === 'not_modified' ||
           e.status === 'skipped_recent') &&
-        iconMtimes.has(getIconRelativePath(e.url)) &&
-        e.rank, // Ensure rank exists
-    )
+        mtime &&
+        e.rank
+      ) {
+        // Update timestamps if missing, using file mtime
+        if (!e.lastCheckTime) e.lastCheckTime = new Date(mtime).toISOString();
+        if (!e.downloadTime) e.downloadTime = new Date(mtime).toISOString();
+        return true;
+      }
+      return false;
+    })
     .sort((a, b) => a.rank - b.rank);
 
   console.log(`📊 Found ${validEntries.length} valid icons to tile.`);
