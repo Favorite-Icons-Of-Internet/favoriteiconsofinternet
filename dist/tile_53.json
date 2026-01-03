@@ -1,4 +1,12 @@
 [
+  "pydev.org",
+  "wearos.google.com",
+  "dartmouth.edu",
+  "harley-davidson.com",
+  "atsc.org",
+  "bupa.co.uk",
+  "michaeljfox.org",
+  "conference-board.org",
   "njmonthly.com",
   "sixt.de",
   "nga.gov",
@@ -76,6 +84,7 @@
   "jegy.hu",
   "esafety.gov.au",
   "monocle.com",
+  "adb.org",
   "aisel.aisnet.org",
   "tass.ru",
   "vcahospitals.com",
@@ -89,14 +98,5 @@
   "distrowatch.com",
   "accessibe.com",
   "iupac.org",
-  "it.wordpress.org",
-  "goodwood.com",
-  "buffalo.edu",
-  "jmir.org",
-  "red-dot.org",
-  "inverse.com",
-  "varnish-cache.org",
-  "kavkazr.com",
-  "wivb.com",
-  "dfat.gov.au"
+  "it.wordpress.org"
 ]

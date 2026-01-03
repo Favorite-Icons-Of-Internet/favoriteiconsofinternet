@@ -1,4 +1,6 @@
 [
+  "alamy.com",
+  "go.dev",
   "google.com.ph",
   "kompas.com",
   "autotrader.com",
@@ -49,6 +51,7 @@
   "tomtom.com",
   "louvre.fr",
   "dni.gov",
+  "www2.census.gov",
   "lifehack.org",
   "newindianexpress.com",
   "natlawreview.com",
@@ -95,8 +98,5 @@
   "barcelona.cat",
   "usercentrics.com",
   "circleci.com",
-  "swift.com",
-  "authy.com",
-  "cmu.edu",
-  "wallet.google.com"
+  "swift.com"
 ]
