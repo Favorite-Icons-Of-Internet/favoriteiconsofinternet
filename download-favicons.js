@@ -16,7 +16,7 @@ const CONFIG = {
   USER_AGENT: 'Mozilla/5.0 (compatible; FaviconDownloader/1.0)',
   TIMEOUT_MS: 10000,
   TARGET_SIZE: 32,
-  SKIP_DOWNLOAD_PERIOD_MS: 24 * 60 * 60 * 1000,
+  SKIP_DOWNLOAD_PERIOD_MS: 90 * 24 * 60 * 60 * 1000,
 };
 
 async function ensureDir(dir) {
@@ -135,9 +135,6 @@ async function downloadFavicons() {
             status: 'skipped_recent',
           });
 
-          if (results.length % CONFIG.SAVE_BATCH_SIZE === 0) {
-            await saveProgress(inputEntries, results, stateMap, CONFIG.OUTPUT_FILE);
-          }
           continue;
         }
       }
