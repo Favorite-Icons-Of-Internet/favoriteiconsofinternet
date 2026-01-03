@@ -5,6 +5,14 @@ import sharp from 'sharp';
 import { sharpsFromIco } from 'sharp-ico';
 import { getDomain, getIconRelativePath } from './utils.js';
 
+const colors = {
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  grey: '\x1b[90m',
+};
+
 // --- Configuration ---
 const CONFIG = {
   INPUT_FILE: 'favicons-processed.json',
@@ -90,7 +98,9 @@ async function downloadFavicons() {
       try {
         faviconUrl = new URL('/favicon.ico', entry.url).href;
       } catch (e) {
-        console.warn(`  Warning: Could not construct fallback favicon URL for ${entry.url}`);
+        console.warn(
+          `${colors.yellow}  Warning: Could not construct fallback favicon URL for ${entry.url}${colors.reset}`,
+        );
       }
     }
 
@@ -105,7 +115,9 @@ async function downloadFavicons() {
 
     if (prevEntry) {
       if (prevEntry.failureCount && prevEntry.failureCount >= CONFIG.MAX_RETRIES) {
-        console.log(`  Skipping: Exceeded max retries (${prevEntry.failureCount})`);
+        console.log(
+          `${colors.grey}  Skipping: Exceeded max retries (${prevEntry.failureCount})${colors.reset}`,
+        );
         results.push({
           ...prevEntry,
           status: 'skipped_max_retries',
@@ -128,7 +140,7 @@ async function downloadFavicons() {
 
         if (now - lastCheck < skipPeriod) {
           console.log(
-            `  Skipping: checked within last ${(skipPeriod / 3600000).toFixed(1)}h (${prevEntry.lastCheckTime})`,
+            `${colors.grey}  Skipping: checked within last ${(skipPeriod / 3600000).toFixed(1)}h (${prevEntry.lastCheckTime})${colors.reset}`,
           );
           results.push({
             ...prevEntry,
@@ -165,11 +177,11 @@ async function downloadFavicons() {
       metadata.httpStatus = response.status;
 
       if (response.status === 304) {
-        console.log(`  Make: 304 Not Modified. (No change)`);
+        console.log(`${colors.green}  Make: 304 Not Modified. (No change)${colors.reset}`);
         status = 'not_modified';
         metadata.failureCount = 0; // Reset on success
       } else if (response.status === 200) {
-        console.log(`  Make: 200 OK. Downloading...`);
+        console.log(`${colors.green}  Make: 200 OK. Downloading...${colors.reset}`);
 
         const buffer = await response.arrayBuffer();
         const imageBuffer = Buffer.from(buffer);
@@ -211,7 +223,7 @@ async function downloadFavicons() {
             }
           } catch (icoError) {
             console.warn(
-              `  Warning: Failed to parse ICO, falling back to standard sharp: ${icoError.message}`,
+              `${colors.yellow}  Warning: Failed to parse ICO, falling back to standard sharp: ${icoError.message}${colors.reset}`,
             );
           }
         }
@@ -223,7 +235,7 @@ async function downloadFavicons() {
 
         await sharpInstance.resize(CONFIG.TARGET_SIZE, CONFIG.TARGET_SIZE).png().toFile(outputPath);
 
-        console.log(`  Saved to ${outputPath}`);
+        console.log(`${colors.green}  Saved to ${outputPath}${colors.reset}`);
 
         // Update Metadata
         metadata.downloadTime = new Date().toISOString();
@@ -234,13 +246,15 @@ async function downloadFavicons() {
         status = 'downloaded';
         metadata.failureCount = 0; // Reset on success
       } else {
-        console.warn(`  Warning: HTTP ${response.status} - ${response.statusText}`);
+        console.warn(
+          `${colors.red}  Warning: HTTP ${response.status} - ${response.statusText}${colors.reset}`,
+        );
         status = 'failed';
         error = `HTTP ${response.status}`;
         metadata.failureCount = (metadata.failureCount || 0) + 1;
       }
     } catch (e) {
-      console.error(`  Error: ${e.message}`);
+      console.error(`${colors.red}  Error: ${e.message}${colors.reset}`);
       status = 'error';
       error = e.message;
       metadata.failureCount = (metadata.failureCount || 0) + 1;
