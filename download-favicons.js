@@ -3,7 +3,7 @@ import path from 'path';
 import { existsSync } from 'fs';
 import sharp from 'sharp';
 import { sharpsFromIco } from 'sharp-ico';
-import { getDomain, getIconRelativePath } from './utils.js';
+import { getDomain, getIconRelativePath, loadIconMtimes } from './utils.js';
 
 const colors = {
   reset: '\x1b[0m',
@@ -99,6 +99,7 @@ async function downloadFavicons() {
 
   // 1. Setup
   await ensureDir(CONFIG.ICONS_DIR);
+  const iconMtimes = await loadIconMtimes(CONFIG.ICONS_DIR);
 
   const inputEntries = await loadJSON(CONFIG.INPUT_FILE);
   if (!inputEntries) {
@@ -150,11 +151,11 @@ async function downloadFavicons() {
 
     // If no previous state, check if file already exists on disk
     if (!prevEntry || !prevEntry.lastCheckTime || !prevEntry.downloadTime) {
-      try {
-        const relativePath = getIconRelativePath(entry.url);
-        const filePath = path.join(CONFIG.ICONS_DIR, relativePath);
-        const stats = await fs.stat(filePath);
-        const mtime = stats.mtime.toISOString();
+      const relativePath = getIconRelativePath(entry.url);
+      const mtimeMs = iconMtimes.get(relativePath);
+
+      if (mtimeMs) {
+        const mtime = new Date(mtimeMs).toISOString();
 
         if (!prevEntry) {
           prevEntry = {
@@ -174,8 +175,6 @@ async function downloadFavicons() {
 
         // Update the map so other concurrent tasks (if any for same URL) or saveProgress see it
         stateMap.set(entry.url, prevEntry);
-      } catch (e) {
-        // File doesn't exist, proceed as new
       }
     }
 

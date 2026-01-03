@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import { Command } from 'commander';
-import { getIconRelativePath, getDomain } from './utils.js';
+import { getIconRelativePath, getDomain, loadIconMtimes } from './utils.js';
 
 const program = new Command();
 
@@ -30,38 +30,6 @@ const CONFIG = {
   EMULATE_MORE_TILES: options.emulate !== 0,
   EMULATE_MORE_TILES_TOTAL_ICONS: options.emulate === true ? 20000 : options.emulate,
 };
-
-async function loadIconMtimes() {
-  console.log(`📂 Loading icon stats from ${CONFIG.ICONS_DIR}...`);
-  const mtimes = new Map();
-
-  async function walk(dir, relativeBase = '') {
-    const files = await fs.readdir(dir, { withFileTypes: true });
-    for (const dirent of files) {
-      const fullPath = path.join(dir, dirent.name);
-      const relativePath = path.join(relativeBase, dirent.name);
-
-      if (dirent.isDirectory()) {
-        await walk(fullPath, relativePath);
-      } else if (dirent.isFile() && dirent.name.endsWith('.png')) {
-        try {
-          const stats = await fs.stat(fullPath);
-          mtimes.set(relativePath, stats.mtimeMs);
-        } catch (e) {
-          // Skip if stat fails
-        }
-      }
-    }
-  }
-
-  try {
-    await walk(CONFIG.ICONS_DIR);
-  } catch (e) {
-    console.error(`❌ Failed to read icons directory: ${e.message}`);
-  }
-  console.log(`✅ Loaded stats for ${mtimes.size} icons.`);
-  return mtimes;
-}
 
 async function ensureDir(dir) {
   try {
@@ -294,7 +262,7 @@ async function generateTiles() {
 
   // 1. Setup
   await ensureDir(CONFIG.TILES_DIR);
-  const iconMtimes = await loadIconMtimes();
+  const iconMtimes = await loadIconMtimes(CONFIG.ICONS_DIR);
 
   // 2. Load Data
   console.log(`📖 Reading ${CONFIG.INPUT_FILE}...`);
