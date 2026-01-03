@@ -1,9 +1,11 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { getIconRelativePath } from './utils.js';
 
 const CONFIG = {
   INPUT_FILE: 'favicons-downloaded.json',
-  OUTPUT_FILE: 'stats.html',
+  OUTPUT_FILE: 'dist/stats.html',
+  ICONS_DIR: 'icons',
 };
 
 async function ensureDir(dir) {
@@ -28,9 +30,26 @@ async function generateStats() {
       byStatus: {},
       byHttpStatus: {},
       byError: {},
+      byFileSize: {
+        '< 1KB': 0,
+        '1KB - 5KB': 0,
+        '5KB - 10KB': 0,
+        '10KB - 50KB': 0,
+        '> 50KB': 0,
+      },
+      totalSize: 0,
+      downloadedCount: 0,
     };
 
-    data.forEach((entry) => {
+    console.log(`Processing ${data.length} entries...`);
+    let processedCount = 0;
+
+    // Use a loop with await for file stats to avoid overwhelming the file system
+    // or use Promise.all with concurrency limit if needed, but linear is fine for stats gen.
+    for (const entry of data) {
+      processedCount++;
+      if (processedCount % 1000 === 0) process.stdout.write(`Processed ${processedCount}...\r`);
+
       // Status
       const status = entry.status || 'unknown';
       stats.byStatus[status] = (stats.byStatus[status] || 0) + 1;
@@ -45,7 +64,36 @@ async function generateStats() {
         const errorMsg = entry.error;
         stats.byError[errorMsg] = (stats.byError[errorMsg] || 0) + 1;
       }
-    });
+
+      // File Size from Disk
+      if (
+        status === 'downloaded' ||
+        status === 'not_modified' ||
+        status === 'skipped_recent'
+      ) {
+        try {
+          const relativePath = getIconRelativePath(entry.url);
+          const filePath = path.join(CONFIG.ICONS_DIR, relativePath);
+          const fileStats = await fs.stat(filePath);
+          const size = fileStats.size;
+
+          stats.totalSize += size;
+          stats.downloadedCount++;
+
+          if (size < 1024) stats.byFileSize['< 1KB']++;
+          else if (size < 5 * 1024) stats.byFileSize['1KB - 5KB']++;
+          else if (size < 10 * 1024) stats.byFileSize['5KB - 10KB']++;
+          else if (size < 50 * 1024) stats.byFileSize['10KB - 50KB']++;
+          else stats.byFileSize['> 50KB']++;
+        } catch (e) {
+          // File might be missing or error reading stat
+        }
+      }
+    }
+    console.log('\n✅ Data processing complete.');
+
+    const avgSize =
+      stats.downloadedCount > 0 ? Math.round(stats.totalSize / stats.downloadedCount) : 0;
 
     const html = `
 <!DOCTYPE html>
@@ -85,9 +133,9 @@ async function generateStats() {
                 <h3>Downloaded</h3>
                 <div class="value">${(stats.byStatus['downloaded'] || 0).toLocaleString()}</div>
             </div>
-            <div class="card">
-                <h3>Not Modified</h3>
-                <div class="value">${(stats.byStatus['not_modified'] || 0).toLocaleString()}</div>
+             <div class="card">
+                <h3>Avg File Size</h3>
+                <div class="value">${(avgSize / 1024).toFixed(2)} KB</div>
             </div>
              <div class="card">
                 <h3>Failed/Error</h3>
@@ -100,6 +148,9 @@ async function generateStats() {
                 <canvas id="statusChart"></canvas>
             </div>
             <div class="chart-container">
+                <canvas id="fileSizeChart"></canvas>
+            </div>
+            <div class="chart-container full-width">
                 <canvas id="httpStatusChart"></canvas>
             </div>
             <div class="chart-container full-width">
@@ -146,6 +197,28 @@ async function generateStats() {
                 plugins: {
                     legend: { position: 'bottom' },
                     title: { display: true, text: 'Status Distribution' }
+                }
+            }
+        });
+
+        // File Size Chart
+        const fileSizeCtx = document.getElementById('fileSizeChart').getContext('2d');
+        new Chart(fileSizeCtx, {
+            type: 'bar',
+            data: {
+                labels: ${JSON.stringify(Object.keys(stats.byFileSize))},
+                datasets: [{
+                    label: 'Count',
+                    data: ${JSON.stringify(Object.values(stats.byFileSize))},
+                    backgroundColor: '#009688'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'File Size Distribution' }
                 }
             }
         });
