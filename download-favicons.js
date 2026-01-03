@@ -19,7 +19,7 @@ const CONFIG = {
   OUTPUT_FILE: 'favicons-downloaded.json',
   ICONS_DIR: 'icons',
   MAX_REQUESTS: 50000,
-  SAVE_BATCH_SIZE: 25,
+  SAVE_BATCH_SIZE: 50,
   MAX_RETRIES: 3,
   USER_AGENT: 'Mozilla/5.0 (compatible; FaviconDownloader/1.0)',
   TIMEOUT_MS: 10000,
