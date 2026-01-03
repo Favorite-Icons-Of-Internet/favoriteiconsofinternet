@@ -19,7 +19,7 @@ const CONFIG = {
   OUTPUT_FILE: 'favicons-downloaded.json',
   ICONS_DIR: 'icons',
   MAX_REQUESTS: 100000,
-  SAVE_BATCH_SIZE: 1000,
+  SAVE_INTERVAL_MS: 3 * 60 * 1000, // 3 minutes
   MAX_RETRIES: 3,
   USER_AGENT: 'Mozilla/5.0 (compatible; FaviconDownloader/1.0)',
   TIMEOUT_MS: 10000,
@@ -73,6 +73,7 @@ async function loadJSON(filePath) {
 }
 
 async function saveProgress(inputEntries, results, stateMap, outputFile) {
+  const tempFile = `${outputFile}.${Date.now()}.tmp`;
   const resultMap = new Map(results.map((r) => [r.url, r]));
 
   const finalOutput = inputEntries.map((entry) => {
@@ -88,10 +89,30 @@ async function saveProgress(inputEntries, results, stateMap, outputFile) {
     return entry;
   });
 
-  await fs.writeFile(outputFile, JSON.stringify(finalOutput, null, 2));
-  console.log(
-    `\n💾 Checkpoint: Saved ${finalOutput.length} entries (processed ${results.length}) to ${outputFile}`,
-  );
+  const jsonContent = JSON.stringify(finalOutput, null, 2);
+
+  try {
+    // Write to temp file
+    await fs.writeFile(tempFile, jsonContent);
+
+    // Verify integrity by reading it back and parsing
+    const readBack = await fs.readFile(tempFile, 'utf-8');
+    JSON.parse(readBack);
+
+    // Rename to final file if verification passes
+    await fs.rename(tempFile, outputFile);
+    console.log(
+      `\n💾 Checkpoint: Saved ${finalOutput.length} entries (processed ${results.length}) to ${outputFile}`,
+    );
+  } catch (error) {
+    console.error(`❌ Failed to save progress: ${error.message}`);
+    // Attempt to clean up temp file if it exists
+    try {
+      if (existsSync(tempFile)) await fs.unlink(tempFile);
+    } catch (cleanupError) {
+      console.error(`⚠️ Failed to cleanup temp file: ${cleanupError.message}`);
+    }
+  }
 }
 
 async function downloadFavicons() {
@@ -325,15 +346,29 @@ async function downloadFavicons() {
     };
   };
 
+  let processingFinished = false;
+  let saveTimer;
+  const scheduleSave = () => {
+    if (processingFinished) return;
+    saveTimer = setTimeout(async () => {
+      if (processingFinished) return;
+      try {
+        await saveProgress(inputEntries, results, stateMap, CONFIG.OUTPUT_FILE);
+      } catch (e) {
+        console.error(`Error saving progress: ${e.message}`);
+      } finally {
+        if (!processingFinished) scheduleSave();
+      }
+    }, CONFIG.SAVE_INTERVAL_MS);
+  };
+  scheduleSave();
+
   const executing = new Set();
 
   for (const entry of targets) {
     const p = processEntry(entry).then(async (result) => {
       results.push(result);
       processedCount++;
-      if (results.length % CONFIG.SAVE_BATCH_SIZE === 0) {
-        await saveProgress(inputEntries, results, stateMap, CONFIG.OUTPUT_FILE);
-      }
       return result;
     });
 
@@ -351,6 +386,9 @@ async function downloadFavicons() {
 
   // Wait for all remaining tasks
   await Promise.all(executing);
+
+  processingFinished = true;
+  clearTimeout(saveTimer);
 
   // 3. Save Results
   await saveProgress(inputEntries, results, stateMap, CONFIG.OUTPUT_FILE);
