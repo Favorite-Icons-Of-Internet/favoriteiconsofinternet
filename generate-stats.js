@@ -30,6 +30,8 @@ async function generateStats() {
       byStatus: {},
       byHttpStatus: {},
       byError: {},
+      byErrorDefault: {},
+      byErrorCustom: {},
       byFileSize: {
         '< 1KB': 0,
         '1KB - 5KB': 0,
@@ -61,8 +63,26 @@ async function generateStats() {
 
       // Errors
       if (entry.error) {
-        const errorMsg = entry.error;
+        let errorMsg = entry.error;
+
+        // Group corrupt header XML errors
+        if (errorMsg.startsWith('Input buffer has corrupt header: glib: XML parse error:')) {
+          errorMsg = 'Input buffer has corrupt header: glib: XML parse error: (grouped)';
+        }
+
         stats.byError[errorMsg] = (stats.byError[errorMsg] || 0) + 1;
+
+        let isDefault = false;
+        try {
+          // A "default" URL is one that just has /favicon.ico as the path
+          isDefault = entry.favicon && new URL(entry.favicon).pathname === '/favicon.ico';
+        } catch (e) {}
+
+        if (isDefault) {
+          stats.byErrorDefault[errorMsg] = (stats.byErrorDefault[errorMsg] || 0) + 1;
+        } else {
+          stats.byErrorCustom[errorMsg] = (stats.byErrorCustom[errorMsg] || 0) + 1;
+        }
       }
 
       // File Size from Disk
@@ -160,14 +180,25 @@ async function generateStats() {
             <thead>
                 <tr>
                     <th>Error Message</th>
-                    <th>Count</th>
+                    <th>Total</th>
+                    <th>Custom URL</th>
+                    <th>Default /favicon.ico</th>
                 </tr>
             </thead>
             <tbody>
                 ${Object.entries(stats.byError)
                   .sort((a, b) => b[1] - a[1])
                   .slice(0, 50)
-                  .map(([error, count]) => `<tr><td>${error}</td><td>${count}</td></tr>`)
+                  .map(([error, count]) => {
+                    const customCount = stats.byErrorCustom[error] || 0;
+                    const defaultCount = stats.byErrorDefault[error] || 0;
+                    return `<tr>
+                        <td>${error}</td>
+                        <td><strong>${count}</strong></td>
+                        <td>${customCount}</td>
+                        <td>${defaultCount}</td>
+                    </tr>`;
+                  })
                   .join('')}
             </tbody>
         </table>
