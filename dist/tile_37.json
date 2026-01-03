@@ -1,4 +1,7 @@
 [
+  "authy.com",
+  "cmu.edu",
+  "wallet.google.com",
   "datatables.net",
   "cardiff.ac.uk",
   "realtor.com",
@@ -95,8 +98,5 @@
   "customer.io",
   "insighttimer.com",
   "rijksmuseum.nl",
-  "paychex.com",
-  "cvs.com",
-  "equifax.com",
-  "defensenews.com"
+  "paychex.com"
 ]
