@@ -3,7 +3,17 @@ import path from 'path';
 import { existsSync } from 'fs';
 import sharp from 'sharp';
 import { sharpsFromIco } from 'sharp-ico';
+import { Command } from 'commander';
 import { getDomain, getIconRelativePath, loadIconMtimes } from './utils.js';
+
+const program = new Command();
+
+program
+  .option('--start <number>', 'Start index', (val) => parseInt(val, 10), 0)
+  .option('--end <number>', 'End index', (val) => parseInt(val, 10), 1000000);
+
+program.parse();
+const options = program.opts();
 
 const colors = {
   reset: '\x1b[0m',
@@ -18,7 +28,8 @@ const CONFIG = {
   INPUT_FILE: 'favicons-processed.json',
   OUTPUT_FILE: 'favicons-downloaded.json',
   ICONS_DIR: 'icons',
-  MAX_REQUESTS: 100000,
+  START_INDEX: options.start,
+  END_INDEX: options.end,
   SAVE_INTERVAL_MS: 3 * 60 * 1000, // 3 minutes
   MAX_RETRIES: 3,
   USER_AGENT: 'Mozilla/5.0 (compatible; FaviconDownloader/1.0)',
@@ -140,9 +151,9 @@ async function downloadFavicons() {
   const stateMap = new Map(previousState.map((e) => [e.url, e]));
 
   // 2. Identify targets
-  // We process the first N entries from the input list (which is ranked).
-  const targets = inputEntries.slice(0, CONFIG.MAX_REQUESTS);
-  console.log(`📊 Processing top ${targets.length} entries.`);
+  // We process entries from the input list (which is ranked) within the specified range.
+  const targets = inputEntries.slice(CONFIG.START_INDEX, CONFIG.END_INDEX);
+  console.log(`📊 Processing entries from ${CONFIG.START_INDEX} to ${CONFIG.END_INDEX} (${targets.length} total).`);
 
   const results = [];
   let processedCount = 0;
