@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
+import ejs from 'ejs';
 import { Command } from 'commander';
 import { getIconRelativePath, getDomain, loadIconMtimes } from './utils.js';
 
@@ -423,85 +424,16 @@ async function generateTiles() {
   const allImagesHtml = eagerImagesHtml + lazyImagesHtml;
 
   // 6. Generate Single Index HTML
-  const finalHtmlContent = `<!DOCTYPE html>
-<html>
-  <head>
-    <title>Favorite Icons of Internet</title>
-    <meta property="og:title" content="Favorite Icons of Internet" />
-    <meta property="og:url" content="https://favoriteiconsofinternet.com" />
-    <meta property="og:description" content="Favorite icons map of internet" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://${CONFIG.HOSTNAME}/og_image.webp" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <base target="_blank" />
-    <meta name="color-scheme" content="light dark">
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: Field;
-      }
-      .tiles-wrapper {
-          font-size: 0;
-          line-height: 0;
-          display: inline-block;
-          width: round(up, 100vw, ${imageSize}px);
-      }
-      img { border: 0; display: inline-block; margin: 0; padding: 0; vertical-align: top; }
-    </style>
-    <script>
-      function loadMap(img, tileIndex, mapIndexOverride) {
-        if (img.dataset.mapLoaded) return;
-        img.dataset.mapLoaded = "true";
-
-        const CONFIG = {
-          GRID_SIZE: ${CONFIG.GRID_SIZE},
-          ICON_SIZE: ${CONFIG.ICON_SIZE},
-          BORDER_SIZE: ${CONFIG.BORDER_SIZE}
-        };
-
-        fetch(\`tile_\${mapIndexOverride ? mapIndexOverride : tileIndex}.json\`)
-          .then(res => res.json())
-          .then(domains => {
-            const mapName = \`map_\${tileIndex}\`;
-            const map = document.createElement('map');
-            map.name = mapName;
-
-            const cellSize = CONFIG.ICON_SIZE + CONFIG.BORDER_SIZE * 2;
-
-            domains.forEach((domain, index) => {
-              const col = index % CONFIG.GRID_SIZE;
-              const row = Math.floor(index / CONFIG.GRID_SIZE);
-              const left = col * cellSize + CONFIG.BORDER_SIZE;
-              const top = row * cellSize + CONFIG.BORDER_SIZE;
-
-              const area = document.createElement('area');
-              area.shape = 'rect';
-              area.coords = \`\${left},\${top},\${left + CONFIG.ICON_SIZE},\${top + CONFIG.ICON_SIZE}\`;
-              area.href = 'https://' + domain;
-              area.title = domain;
-              map.appendChild(area);
-            });
-
-            img.after(map);
-          })
-          .catch(err => {
-            console.error('Failed to load map for tile ' + tileIndex, err);
-            delete img.dataset.mapLoaded;
-          });
-      }
-    </script>
-</head>
-<body>
-    <div class="tiles-wrapper">
-      ${allImagesHtml}
-    </div>
-</body>
-</html>`;
+  const templatePath = path.join(process.cwd(), 'index.ejs');
+  const template = await fs.readFile(templatePath, 'utf-8');
+  const finalHtmlContent = ejs.render(template, {
+    hostname: CONFIG.HOSTNAME,
+    imageSize,
+    gridSize: CONFIG.GRID_SIZE,
+    iconSize: CONFIG.ICON_SIZE,
+    borderSize: CONFIG.BORDER_SIZE,
+    allImagesHtml,
+  });
 
   const indexHtmlPath = path.join(CONFIG.TILES_DIR, 'index.html');
   await fs.writeFile(indexHtmlPath, finalHtmlContent);
