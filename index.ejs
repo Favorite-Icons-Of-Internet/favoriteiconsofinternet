@@ -10,7 +10,7 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <base target="_blank" />
-    <meta name="color-scheme" content="light dark">
+    <meta name="color-scheme" content="light dark" />
     <style>
       * {
         box-sizing: border-box;
@@ -21,27 +21,158 @@
         background-color: Field;
       }
       .tiles-wrapper {
-          font-size: 0;
-          line-height: 0;
-          display: inline-block;
-          width: round(up, 100vw, <%= imageSize %>px);
+        font-size: 0;
+        line-height: 0;
+        display: inline-block;
+        width: round(up, 100vw, <%= imageSize %>px);
       }
-      img { border: 0; display: inline-block; margin: 0; padding: 0; vertical-align: top; }
+      img {
+        border: 0;
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+        vertical-align: top;
+      }
+      #domain-popover {
+        position: fixed;
+        inset: unset;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        font-size: 12px;
+        pointer-events: auto; /* Enable interaction for the close button */
+        z-index: 1000;
+        white-space: nowrap;
+        margin: 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        border: 0;
+        display: none;
+        align-items: center;
+        gap: 8px;
+      }
+      #domain-popover:popover-open {
+        display: flex;
+      }
+      #domain-popover button {
+        background: none;
+        border: none;
+        color: #ccc;
+        cursor: pointer;
+        padding: 2px 4px;
+        font-size: 14px;
+        line-height: 1;
+        border-radius: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #domain-popover button:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+      }
     </style>
     <script>
+      const CONFIG = {
+        GRID_SIZE: <%= gridSize %>,
+        ICON_SIZE: <%= iconSize %>,
+        BORDER_SIZE: <%= borderSize %>
+      };
+
+      function updatePopover(area) {
+        if (!area) {
+          document.getElementById('domain-popover').hidePopover();
+          return;
+        }
+        const popover = document.getElementById('domain-popover');
+        const domain = area.dataset.domain;
+        const left = parseFloat(area.dataset.relLeft);
+        const top = parseFloat(area.dataset.relTop);
+        const iconSize = parseFloat(area.dataset.iconSize);
+
+        const map = area.parentNode;
+        const img = map.previousElementSibling;
+
+        popover.innerHTML = `<span>${domain}</span><button aria-label="Close">&times;</button>`;
+        popover.dataset.targetDomain = domain;
+        popover.triggerArea = area; // Store reference to keep focus on it
+        popover.showPopover();
+
+        const imgRect = img.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const gap = 6;
+
+        // Calculate icon's viewport coordinates
+        const iconRect = {
+          left: imgRect.left + left,
+          top: imgRect.top + top,
+          width: iconSize,
+          height: iconSize,
+        };
+        iconRect.right = iconRect.left + iconRect.width;
+        iconRect.bottom = iconRect.top + iconRect.height;
+        iconRect.centerX = iconRect.left + iconRect.width / 2;
+        iconRect.centerY = iconRect.top + iconRect.height / 2;
+
+        const popRect = popover.getBoundingClientRect();
+        const pW = popRect.width;
+        const pH = popRect.height;
+
+        // Define candidate positions
+        const positions = [
+          // Bottom
+          {
+            side: 'bottom',
+            check: () => iconRect.bottom + gap + pH <= viewportHeight,
+            getPos: () => ({ left: iconRect.centerX - pW / 2, top: iconRect.bottom + gap }),
+          },
+          // Top
+          {
+            side: 'top',
+            check: () => iconRect.top - gap - pH >= 0,
+            getPos: () => ({ left: iconRect.centerX - pW / 2, top: iconRect.top - gap - pH }),
+          },
+          // Right
+          {
+            side: 'right',
+            check: () => iconRect.right + gap + pW <= viewportWidth,
+            getPos: () => ({ left: iconRect.right + gap, top: iconRect.centerY - pH / 2 }),
+          },
+          // Left
+          {
+            side: 'left',
+            check: () => iconRect.left - gap - pW >= 0,
+            getPos: () => ({ left: iconRect.left - gap - pW, top: iconRect.centerY - pH / 2 }),
+          },
+        ];
+
+        // Find first fitting position, default to Bottom if none fit perfectly
+        let selected = positions.find((p) => p.check()) || positions[0];
+        let { left: finalLeft, top: finalTop } = selected.getPos();
+
+        // Clamp to viewport edges to handle cross-axis overflow
+        if (selected.side === 'right' || selected.side === 'left') {
+          finalTop = Math.max(gap, Math.min(finalTop, viewportHeight - pH - gap));
+        } else {
+          finalLeft = Math.max(gap, Math.min(finalLeft, viewportWidth - pW - gap));
+        }
+
+        popover.style.left = finalLeft + 'px';
+        popover.style.top = finalTop + 'px';
+      }
+
       function loadMap(img, tileIndex, mapIndexOverride) {
         if (img.dataset.mapLoaded) return;
-        img.dataset.mapLoaded = "true";
-
-        const CONFIG = {
-          GRID_SIZE: <%= gridSize %>,
-          ICON_SIZE: <%= iconSize %>,
-          BORDER_SIZE: <%= borderSize %>
-        };
+        img.dataset.mapLoaded = 'true';
 
         fetch(`tile_${mapIndexOverride ? mapIndexOverride : tileIndex}.json`)
-          .then(res => res.json())
-          .then(domains => {
+          .then((res) => res.json())
+          .then((domains) => {
             const mapName = `map_${tileIndex}`;
             const map = document.createElement('map');
             map.name = mapName;
@@ -58,22 +189,139 @@
               area.shape = 'rect';
               area.coords = `${left},${top},${left + CONFIG.ICON_SIZE},${top + CONFIG.ICON_SIZE}`;
               area.href = 'https://' + domain;
-              area.title = domain;
+
+              // Store data for the global update function
+              area.dataset.domain = domain;
+              area.dataset.relLeft = left;
+              area.dataset.relTop = top;
+              area.dataset.iconSize = CONFIG.ICON_SIZE;
+
+              area.addEventListener('focus', () => {
+                if (area.dataset.justDismissed) return;
+                updatePopover(area);
+              });
+
+              area.addEventListener('blur', () => {
+                // No-op for blur to support light dismiss
+              });
+
+              area.addEventListener('mouseenter', () => {
+                if (area.dataset.justDismissed) {
+                  delete area.dataset.justDismissed;
+                  return;
+                }
+
+                const active = document.activeElement;
+                const popover = document.getElementById('domain-popover');
+                const isOpen = popover.matches(':popover-open');
+
+                // If focused element has the popover locked, ignore hover
+                if (
+                  active &&
+                  active.tagName === 'AREA' &&
+                  isOpen &&
+                  popover.dataset.targetDomain === active.dataset.domain
+                ) {
+                  return;
+                }
+                updatePopover(area);
+              });
+
+              area.addEventListener('mouseleave', (e) => {
+                const popover = document.getElementById('domain-popover');
+
+                // If moving to the popover, don't hide
+                if (
+                  e.relatedTarget &&
+                  (e.relatedTarget === popover || popover.contains(e.relatedTarget))
+                ) {
+                  return;
+                }
+
+                const active = document.activeElement;
+                const isOpen = popover.matches(':popover-open');
+
+                // If focused element has the popover locked, don't hide
+                if (
+                  active &&
+                  active.tagName === 'AREA' &&
+                  isOpen &&
+                  popover.dataset.targetDomain === active.dataset.domain
+                ) {
+                  return;
+                }
+                popover.hidePopover();
+              });
+
               map.appendChild(area);
             });
 
             img.after(map);
           })
-          .catch(err => {
+          .catch((err) => {
             console.error('Failed to load map for tile ' + tileIndex, err);
             delete img.dataset.mapLoaded;
           });
       }
+
+      function setupPopover() {
+        const popover = document.getElementById('domain-popover');
+
+        popover.addEventListener('mouseleave', (e) => {
+          // If moving back to an AREA, don't hide (let area's mouseenter handle it)
+          if (e.relatedTarget && e.relatedTarget.tagName === 'AREA') return;
+
+          // Check focus lock
+          const active = document.activeElement;
+          const isOpen = popover.matches(':popover-open');
+          if (
+            active &&
+            active.tagName === 'AREA' &&
+            isOpen &&
+            popover.dataset.targetDomain === active.dataset.domain
+          ) {
+            return;
+          }
+
+          popover.hidePopover();
+        });
+
+        // Handle Escape key
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            if (popover.matches(':popover-open')) {
+              const trigger = popover.triggerArea;
+              const active = document.activeElement;
+              if (trigger && active === trigger) {
+                trigger.dataset.justDismissed = 'true';
+              }
+            }
+          }
+        });
+
+        // Handle close button click specifically to set dismissal flag and preserve focus
+        document.addEventListener('click', (e) => {
+          const btn = e.target.closest('#domain-popover button');
+          if (btn) {
+            e.preventDefault(); // Manual handling
+            const trigger = popover.triggerArea;
+            if (trigger) {
+              // Set a temporary flag to prevent immediate re-open
+              trigger.dataset.justDismissed = 'true';
+              // Preserve focus on the icon
+              trigger.focus();
+            }
+            popover.hidePopover();
+          }
+        });
+      }
     </script>
-</head>
-<body>
-    <div class="tiles-wrapper">
-      <%- allImagesHtml %>
-    </div>
-</body>
+  </head>
+  <body>
+    <div id="domain-popover" popover="auto"></div>
+    <script>
+      setupPopover();
+    </script>
+    <div class="tiles-wrapper"><%- allImagesHtml %></div>
+  </body>
 </html>
